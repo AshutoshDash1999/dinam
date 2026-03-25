@@ -22,6 +22,7 @@ export type CalendarEventMock = {
 export type QuickLaunchItem = {
   id: string
   name: string
+  href: string
   icon: "mail" | "sticky-note" | "github" | "calendar" | "cloud" | "message"
 }
 
@@ -66,12 +67,12 @@ export const MOCK_CALENDAR: CalendarEventMock[] = [
 ]
 
 export const MOCK_QUICK_LAUNCH: QuickLaunchItem[] = [
-  { id: "q1", name: "Gmail", icon: "mail" },
-  { id: "q2", name: "Notion", icon: "sticky-note" },
-  { id: "q3", name: "GitHub", icon: "github" },
-  { id: "q4", name: "Calendar", icon: "calendar" },
-  { id: "q5", name: "Weather", icon: "cloud" },
-  { id: "q6", name: "Slack", icon: "message" },
+  { id: "q1", name: "Gmail", href: "https://mail.google.com", icon: "mail" },
+  { id: "q2", name: "Notion", href: "https://notion.so", icon: "sticky-note" },
+  { id: "q3", name: "GitHub", href: "https://github.com", icon: "github" },
+  { id: "q4", name: "Calendar", href: "https://calendar.google.com", icon: "calendar" },
+  { id: "q5", name: "Weather", href: "https://weather.com", icon: "cloud" },
+  { id: "q6", name: "Slack", href: "https://slack.com", icon: "message" },
 ]
 
 export const MOCK_WEATHER = {
