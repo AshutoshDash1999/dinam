@@ -16,8 +16,6 @@ export function TasksSection() {
     const [editLabel, setEditLabel] = useState("")
     const skipEditCommitOnBlur = useRef(false)
 
-    const remaining = todos.filter((t) => !t.done).length
-
     const toggleTodo = (id: string) => {
         setTodos((prev) =>
             prev.map((t) => (t.id === id ? { ...t, done: !t.done } : t)),
@@ -64,18 +62,11 @@ export function TasksSection() {
     }
 
     return (
-        <article className="flex min-h-0 flex-col rounded-3xl bg-card p-7 lg:col-span-2">
+        <article className="flex min-h-0 flex-col rounded-[1.75rem] bg-card p-6 shadow-md ring-1 ring-border/40 lg:p-7">
             <div className="mb-6 flex shrink-0 items-center justify-between gap-3">
-                <h2 className="text-lg font-bold text-card-foreground">
-                    Today&apos;s Tasks
+                <h2 className="text-[0.6875rem] font-semibold tracking-[0.14em] text-muted-foreground uppercase">
+                    Focus items
                 </h2>
-                <span className="inline-flex items-center gap-1.5 rounded-full bg-accent px-3 py-1 text-xs font-semibold tracking-wide text-accent-foreground uppercase">
-                    <span
-                        className="size-1.5 shrink-0 rounded-full bg-primary"
-                        aria-hidden
-                    />
-                    {remaining} remaining
-                </span>
             </div>
             <div
                 className={cn(
@@ -91,10 +82,10 @@ export function TasksSection() {
                                     type="button"
                                     onClick={() => toggleTodo(todo.id)}
                                     className={cn(
-                                        "mt-0.5 flex size-5 shrink-0 items-center justify-center rounded-md border-2 transition-colors",
+                                        "mt-0.5 flex size-5 shrink-0 items-center justify-center rounded-full border-2 transition-colors",
                                         todo.done
                                             ? "border-primary bg-primary text-primary-foreground"
-                                            : "border-border bg-muted",
+                                            : "border-primary/35 bg-transparent",
                                     )}
                                     aria-label={
                                         todo.done

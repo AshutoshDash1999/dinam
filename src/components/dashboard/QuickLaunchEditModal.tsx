@@ -1,10 +1,26 @@
-import { useEffect, type Dispatch, type SetStateAction } from "react"
+import { Plus, Trash2 } from "lucide-react"
+import { type Dispatch, type SetStateAction } from "react"
 
 import { Button } from "@/components/ui/button"
+import {
+    Dialog,
+    DialogContent,
+    DialogDescription,
+    DialogFooter,
+    DialogHeader,
+    DialogTitle,
+} from "@/components/ui/dialog"
+import { Input } from "@/components/ui/input"
+import type { QuickLaunchIconKey } from "@/data/dashboard-mock"
 
-const QUICK_LAUNCH_SLOTS = 6
+const MAX_QUICK_LAUNCH_LINKS = 8
 
-export type QuickLaunchDraftSlot = { name: string; href: string }
+export type QuickLaunchDraftSlot = {
+    id?: string
+    name: string
+    href: string
+    icon?: QuickLaunchIconKey
+}
 
 type QuickLaunchEditModalProps = {
     open: boolean
@@ -21,109 +37,136 @@ export function QuickLaunchEditModal({
     onClose,
     onSave,
 }: QuickLaunchEditModalProps) {
-    useEffect(() => {
-        if (!open) return
-        const onKeyDown = (e: KeyboardEvent) => {
-            if (e.key === "Escape") onClose()
-        }
-        window.addEventListener("keydown", onKeyDown)
-        return () => window.removeEventListener("keydown", onKeyDown)
-    }, [open, onClose])
+    const removeSlot = (index: number) => {
+        onDraftChange((prev) => prev.filter((_, i) => i !== index))
+    }
 
-    if (!open) return null
+    const addSlot = () => {
+        onDraftChange((prev) => {
+            if (prev.length >= MAX_QUICK_LAUNCH_LINKS) return prev
+            return [...prev, { name: "", href: "" }]
+        })
+    }
 
     return (
-        <div
-            className="fixed inset-0 z-50 flex items-center justify-center p-4"
-            role="presentation"
+        <Dialog
+            open={open}
+            onOpenChange={(next) => {
+                if (!next) onClose()
+            }}
         >
-            <button
-                type="button"
-                className="absolute inset-0 bg-black/50 backdrop-blur-[2px]"
-                aria-label="Close dialog"
-                onClick={onClose}
-            />
-            <div
-                role="dialog"
-                aria-modal="true"
-                aria-labelledby="quick-launch-edit-title"
-                className="relative z-10 w-full max-w-md rounded-2xl border border-border/80 bg-card p-6 shadow-xl"
-                onMouseDown={(e) => e.stopPropagation()}
+            <DialogContent
+                className="max-h-[min(90vh,32rem)] gap-0 overflow-hidden sm:max-w-md"
+                showCloseButton
             >
-                <h3
-                    id="quick-launch-edit-title"
-                    className="text-lg font-bold text-card-foreground"
-                >
-                    Edit quick links
-                </h3>
-                <p className="mt-1 text-sm text-muted-foreground">
-                    Set a name and URL for each shortcut (up to{" "}
-                    {QUICK_LAUNCH_SLOTS}).
-                </p>
-                <div className="mt-5 max-h-[min(60vh,22rem)] space-y-3 overflow-y-auto pr-1">
+                <DialogHeader>
+                    <DialogTitle>Edit quick links</DialogTitle>
+                    <DialogDescription>
+                        Add a name and URL for each shortcut. Remove rows you
+                        don&apos;t need (up to {MAX_QUICK_LAUNCH_LINKS} links).
+                    </DialogDescription>
+                </DialogHeader>
+                <div className="mt-4 max-h-[min(50vh,20rem)] space-y-3 overflow-y-auto pr-1">
                     {draft.map((slot, index) => (
                         <div
-                            key={index}
-                            className="grid grid-cols-1 gap-2 sm:grid-cols-2"
+                            key={slot.id ?? `draft-${index}`}
+                            className="flex flex-col gap-2 sm:flex-row sm:items-end"
                         >
-                            <label
-                                className="sr-only"
-                                htmlFor={`ql-name-${index}`}
+                            <div className="grid min-w-0 flex-1 grid-cols-1 gap-2 sm:grid-cols-2">
+                                <div className="space-y-1">
+                                    <label
+                                        className="sr-only"
+                                        htmlFor={`ql-name-${index}`}
+                                    >
+                                        Link {index + 1} name
+                                    </label>
+                                    <Input
+                                        id={`ql-name-${index}`}
+                                        type="text"
+                                        value={slot.name}
+                                        onChange={(e) =>
+                                            onDraftChange((prev) =>
+                                                prev.map((s, i) =>
+                                                    i === index
+                                                        ? {
+                                                              ...s,
+                                                              name: e.target
+                                                                  .value,
+                                                          }
+                                                        : s,
+                                                ),
+                                            )
+                                        }
+                                        placeholder="Name"
+                                        className="rounded-xl"
+                                    />
+                                </div>
+                                <div className="space-y-1">
+                                    <label
+                                        className="sr-only"
+                                        htmlFor={`ql-href-${index}`}
+                                    >
+                                        Link {index + 1} URL
+                                    </label>
+                                    <Input
+                                        id={`ql-href-${index}`}
+                                        type="url"
+                                        value={slot.href}
+                                        onChange={(e) =>
+                                            onDraftChange((prev) =>
+                                                prev.map((s, i) =>
+                                                    i === index
+                                                        ? {
+                                                              ...s,
+                                                              href: e.target
+                                                                  .value,
+                                                          }
+                                                        : s,
+                                                ),
+                                            )
+                                        }
+                                        placeholder="https://…"
+                                        className="rounded-xl"
+                                    />
+                                </div>
+                            </div>
+                            <Button
+                                type="button"
+                                variant="ghost"
+                                size="icon"
+                                className="shrink-0 text-muted-foreground hover:text-destructive"
+                                onClick={() => removeSlot(index)}
+                                aria-label={`Remove link ${index + 1}`}
                             >
-                                Link {index + 1} name
-                            </label>
-                            <input
-                                id={`ql-name-${index}`}
-                                type="text"
-                                value={slot.name}
-                                onChange={(e) =>
-                                    onDraftChange((prev) =>
-                                        prev.map((s, i) =>
-                                            i === index
-                                                ? { ...s, name: e.target.value }
-                                                : s,
-                                        ),
-                                    )
-                                }
-                                placeholder={`Name ${index + 1}`}
-                                className="rounded-xl border border-border/80 bg-background px-3 py-2 text-sm text-foreground outline-none placeholder:text-muted-foreground focus-visible:ring-2 focus-visible:ring-ring/25"
-                            />
-                            <label
-                                className="sr-only"
-                                htmlFor={`ql-href-${index}`}
-                            >
-                                Link {index + 1} URL
-                            </label>
-                            <input
-                                id={`ql-href-${index}`}
-                                type="url"
-                                value={slot.href}
-                                onChange={(e) =>
-                                    onDraftChange((prev) =>
-                                        prev.map((s, i) =>
-                                            i === index
-                                                ? { ...s, href: e.target.value }
-                                                : s,
-                                        ),
-                                    )
-                                }
-                                placeholder="https://…"
-                                className="rounded-xl border border-border/80 bg-background px-3 py-2 text-sm text-foreground outline-none placeholder:text-muted-foreground focus-visible:ring-2 focus-visible:ring-ring/25"
-                            />
+                                <Trash2 className="size-4" strokeWidth={2} />
+                            </Button>
                         </div>
                     ))}
                 </div>
-                <div className="mt-6 flex flex-wrap justify-end gap-2">
+                <div className="mt-3">
+                    <Button
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        className="w-full gap-2 sm:w-auto"
+                        onClick={addSlot}
+                        disabled={draft.length >= MAX_QUICK_LAUNCH_LINKS}
+                    >
+                        <Plus className="size-4" strokeWidth={2} />
+                        Add link
+                    </Button>
+                </div>
+                <DialogFooter className="mt-6">
                     <Button type="button" variant="outline" onClick={onClose}>
                         Cancel
                     </Button>
                     <Button type="button" onClick={onSave}>
                         Save
                     </Button>
-                </div>
-            </div>
-        </div>
+                </DialogFooter>
+            </DialogContent>
+        </Dialog>
     )
 }
 
-export { QUICK_LAUNCH_SLOTS }
+export { MAX_QUICK_LAUNCH_LINKS }

@@ -1,20 +1,13 @@
-import { Quote } from "lucide-react"
-
 import { MOCK_QUOTE } from "@/data/dashboard-mock"
 
 export function QuoteCard() {
     return (
-        <article className="relative overflow-hidden rounded-3xl bg-primary px-8 py-10 text-primary-foreground shadow-lg lg:col-span-3">
-            <Quote
-                className="absolute -top-2 -left-1 size-32 text-primary-foreground/15 sm:size-40"
-                strokeWidth={1}
-                aria-hidden
-            />
-            <blockquote className="relative z-1">
-                <p className="max-w-xl text-2xl leading-snug font-bold tracking-tight sm:text-3xl sm:leading-tight">
+        <article className="rounded-[1.75rem] bg-card p-7 shadow-md ring-1 ring-border/40 sm:p-8">
+            <blockquote>
+                <p className="text-lg leading-snug font-bold tracking-tight text-card-foreground sm:text-xl">
                     &ldquo;{MOCK_QUOTE.text}&rdquo;
                 </p>
-                <footer className="mt-6 text-base text-primary-foreground/80">
+                <footer className="mt-5 text-[0.6875rem] font-semibold tracking-[0.12em] text-primary uppercase">
                     — {MOCK_QUOTE.author}
                 </footer>
             </blockquote>

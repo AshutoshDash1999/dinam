@@ -19,46 +19,74 @@ export type CalendarEventMock = {
   title: string
 }
 
+export type QuickLaunchIconKey =
+  | "mail"
+  | "file"
+  | "calendar"
+  | "terminal"
+  | "folder"
+  | "music"
+  | "camera"
+
 export type QuickLaunchItem = {
   id: string
   name: string
   href: string
-  icon: "mail" | "sticky-note" | "github" | "calendar" | "cloud" | "message"
+  icon: QuickLaunchIconKey
+}
+
+/** Icons assigned to new slots by order (cycles). */
+export const QUICK_LAUNCH_ICON_POOL: readonly QuickLaunchIconKey[] = [
+  "mail",
+  "file",
+  "calendar",
+  "terminal",
+  "folder",
+  "music",
+  "camera",
+] as const
+
+export type BookmarkItem = {
+  id: string
+  title: string
+  href: string
 }
 
 export const MOCK_QUOTE = {
-  text: "The quality of your life is determined by the quality of your thoughts.",
-  author: "Marcus Aurelius",
+  text: "The details are not the details. They make the design.",
+  author: "Charles Eames",
 } as const
 
 export const MOCK_NEWS: NewsItem[] = [
   {
     id: "n1",
-    source: "The Verge",
+    source: "New York Times",
     timeAgo: "12m ago",
-    headline: "Apple's M4 Chip: Everything we know so far",
-    thumbClass: "bg-chart-1/40 dark:bg-chart-1/30",
+    headline:
+      "The future of generative AI in high-end industrial design",
+    thumbClass: "bg-chart-1/45 dark:bg-chart-1/35",
   },
   {
     id: "n2",
-    source: "9to5Mac",
+    source: "Wired",
     timeAgo: "1h ago",
-    headline: "iOS 18 rumors: what to expect this fall",
-    thumbClass: "bg-chart-2/40 dark:bg-chart-2/30",
+    headline: "Silicon Photonics: The next leap in computing power",
+    thumbClass: "bg-chart-2/45 dark:bg-chart-2/35",
   },
   {
     id: "n3",
-    source: "Hacker News",
+    source: "The Verge",
     timeAgo: "3h ago",
-    headline: "Why Rust is the future of systems programming",
-    thumbClass: "bg-chart-3/40 dark:bg-chart-3/30",
+    headline:
+      "Spatial audio and the revolution of personal workspace",
+    thumbClass: "bg-chart-3/45 dark:bg-chart-3/35",
   },
 ]
 
 export const MOCK_TODOS: TodoMock[] = [
-  { id: "t1", label: "Review quarterly editorial strategy", done: false },
-  { id: "t2", label: "Call with lead architect", done: false },
-  { id: "t3", label: "Morning meditation", done: true },
+  { id: "t1", label: "Finalize design system documentation", done: false },
+  { id: "t2", label: "Review Q4 production schedule", done: false },
+  { id: "t3", label: "Prepare atelier portfolio update", done: false },
 ]
 
 export const MOCK_CALENDAR: CalendarEventMock[] = [
@@ -67,12 +95,41 @@ export const MOCK_CALENDAR: CalendarEventMock[] = [
 ]
 
 export const MOCK_QUICK_LAUNCH: QuickLaunchItem[] = [
-  { id: "q1", name: "Gmail", href: "https://mail.google.com", icon: "mail" },
-  { id: "q2", name: "Notion", href: "https://notion.so", icon: "sticky-note" },
-  { id: "q3", name: "GitHub", href: "https://github.com", icon: "github" },
-  { id: "q4", name: "Calendar", href: "https://calendar.google.com", icon: "calendar" },
-  { id: "q5", name: "Weather", href: "https://weather.com", icon: "cloud" },
-  { id: "q6", name: "Slack", href: "https://slack.com", icon: "message" },
+  { id: "q1", name: "Mail", href: "https://mail.google.com", icon: "mail" },
+  { id: "q2", name: "Documents", href: "https://notion.so", icon: "file" },
+  {
+    id: "q3",
+    name: "Calendar",
+    href: "https://calendar.google.com",
+    icon: "calendar",
+  },
+  { id: "q4", name: "Terminal", href: "https://github.com", icon: "terminal" },
+  { id: "q5", name: "Files", href: "#", icon: "folder" },
+  { id: "q6", name: "Music", href: "#", icon: "music" },
+  { id: "q7", name: "Camera", href: "#", icon: "camera" },
+]
+
+export const MOCK_BOOKMARKS: BookmarkItem[] = [
+  {
+    id: "b1",
+    title: "Design reference",
+    href: "https://www.are.na",
+  },
+  {
+    id: "b2",
+    title: "Typography",
+    href: "https://fonts.google.com",
+  },
+  {
+    id: "b3",
+    title: "Color & contrast",
+    href: "https://coolors.co",
+  },
+  {
+    id: "b4",
+    title: "Documentation",
+    href: "https://developer.mozilla.org",
+  },
 ]
 
 export const MOCK_WEATHER = {
