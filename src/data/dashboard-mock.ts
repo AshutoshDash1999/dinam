@@ -36,28 +36,28 @@ export const MOCK_NEWS: NewsItem[] = [
     source: "The Verge",
     timeAgo: "12m ago",
     headline: "Apple's M4 Chip: Everything we know so far",
-    thumbClass: "bg-sky-200 dark:bg-sky-900",
+    thumbClass: "bg-chart-1/40 dark:bg-chart-1/30",
   },
   {
     id: "n2",
     source: "9to5Mac",
     timeAgo: "1h ago",
     headline: "iOS 18 rumors: what to expect this fall",
-    thumbClass: "bg-purple-200 dark:bg-purple-900",
+    thumbClass: "bg-chart-2/40 dark:bg-chart-2/30",
   },
   {
     id: "n3",
     source: "Hacker News",
     timeAgo: "3h ago",
     headline: "Why Rust is the future of systems programming",
-    thumbClass: "bg-orange-200 dark:bg-orange-900",
+    thumbClass: "bg-chart-3/40 dark:bg-chart-3/30",
   },
 ]
 
 export const MOCK_TODOS: TodoMock[] = [
-  { id: "t1", label: "Morning meditation", done: true },
-  { id: "t2", label: "Review project roadmap", done: false },
-  { id: "t3", label: "Inbox zero", done: false },
+  { id: "t1", label: "Review quarterly editorial strategy", done: false },
+  { id: "t2", label: "Call with lead architect", done: false },
+  { id: "t3", label: "Morning meditation", done: true },
 ]
 
 export const MOCK_CALENDAR: CalendarEventMock[] = [
@@ -70,10 +70,13 @@ export const MOCK_QUICK_LAUNCH: QuickLaunchItem[] = [
   { id: "q2", name: "Notion", icon: "sticky-note" },
   { id: "q3", name: "GitHub", icon: "github" },
   { id: "q4", name: "Calendar", icon: "calendar" },
-  { id: "q5", name: "Drive", icon: "cloud" },
+  { id: "q5", name: "Weather", icon: "cloud" },
   { id: "q6", name: "Slack", icon: "message" },
 ]
 
-export const MOCK_WEATHER = "28°C · Sunny"
+export const MOCK_WEATHER = {
+  city: "San Francisco",
+  summary: "28°C · Sunny",
+} as const
 
 export const MOCK_STREAK_DAYS = 5
