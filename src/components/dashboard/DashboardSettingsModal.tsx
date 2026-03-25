@@ -4,6 +4,7 @@ import { type ChangeEvent, useId, useRef, useState } from "react"
 
 import { useTheme } from "@/components/theme-provider"
 import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
 import {
     Dialog,
     DialogContent,
@@ -18,6 +19,10 @@ import {
     SelectTrigger,
     SelectValue,
 } from "@/components/ui/select"
+import {
+    DEFAULT_SEARCH_URL_TEMPLATE,
+    isSearchUrlTemplateValid,
+} from "@/lib/search-engine"
 import {
     ACCENT_OPTIONS,
     type AccentId,
@@ -35,8 +40,14 @@ export function DashboardSettingsModal({
     open,
     onOpenChange,
 }: DashboardSettingsModalProps) {
-    const { accent, setAccent, dashboardWallpaper, setDashboardWallpaper } =
-        useTheme()
+    const {
+        accent,
+        setAccent,
+        dashboardWallpaper,
+        setDashboardWallpaper,
+        searchUrlTemplate,
+        setSearchUrlTemplate,
+    } = useTheme()
     const fileInputRef = useRef<HTMLInputElement>(null)
     const wallpaperInputId = useId()
     const [wallpaperError, setWallpaperError] = useState<string | null>(null)
@@ -157,6 +168,47 @@ export function DashboardSettingsModal({
                                     className="aspect-video max-h-28 w-full object-cover"
                                 />
                             </div>
+                        ) : null}
+                    </div>
+
+                    <div className="grid gap-2 border-border/60 border-t pt-2">
+                        <label
+                            className="text-xs font-medium tracking-wide text-muted-foreground uppercase"
+                            htmlFor="dashboard-search-url"
+                        >
+                            Search URL
+                        </label>
+                        <p className="text-xs text-muted-foreground">
+                            Full search URL for text queries in the dashboard
+                            box. Put{" "}
+                            <code className="rounded bg-muted px-1 py-px text-[0.7rem]">
+                                %s
+                            </code>{" "}
+                            where the terms go (e.g.{" "}
+                            <code className="rounded bg-muted px-1 py-px text-[0.7rem]">
+                                https://duckduckgo.com/?q=%s
+                            </code>
+                            ). Sites can’t read your browser’s default engine—use
+                            the same pattern as your address bar. Not used when
+                            you open a direct URL.
+                        </p>
+                        <Input
+                            id="dashboard-search-url"
+                            type="url"
+                            spellCheck={false}
+                            autoComplete="off"
+                            value={searchUrlTemplate}
+                            onChange={(e) =>
+                                setSearchUrlTemplate(e.target.value)
+                            }
+                            placeholder={DEFAULT_SEARCH_URL_TEMPLATE}
+                            className="rounded-2xl border-border/80 font-mono text-sm"
+                        />
+                        {!isSearchUrlTemplateValid(searchUrlTemplate) ? (
+                            <p className="text-xs text-destructive">
+                                Add %s for the query. Searches will use Google
+                                until this is fixed.
+                            </p>
                         ) : null}
                     </div>
 

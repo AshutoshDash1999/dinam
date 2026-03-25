@@ -2,6 +2,10 @@
 import * as React from "react"
 
 import {
+    DEFAULT_SEARCH_URL_TEMPLATE,
+    getInitialSearchUrlTemplate,
+} from "@/lib/search-engine"
+import {
     ACCENT_CSS_VARS,
     ACCENT_PRESETS,
     isAccentId,
@@ -21,6 +25,11 @@ type ThemeProviderProps = {
     defaultAccent?: AccentId
     /** Base64 data URL or remote URL for dashboard background; persisted in localStorage. */
     dashboardWallpaperStorageKey?: string
+    /** localStorage key for search URL template with `%s` (default: `dashboard-search-url`). */
+    searchUrlTemplateStorageKey?: string
+    /** Previous preset id storage; read once to migrate, then removed. */
+    legacySearchEngineStorageKey?: string
+    defaultSearchUrlTemplate?: string
     disableTransitionOnChange?: boolean
 }
 
@@ -32,6 +41,9 @@ type ThemeProviderState = {
     /** Data URL or absolute URL; `null` clears the wallpaper. */
     dashboardWallpaper: string | null
     setDashboardWallpaper: (value: string | null) => void
+    /** Full URL template; use `%s` where the encoded query belongs. */
+    searchUrlTemplate: string
+    setSearchUrlTemplate: (template: string) => void
 }
 
 const COLOR_SCHEME_QUERY = "(prefers-color-scheme: dark)"
@@ -108,6 +120,9 @@ export function ThemeProvider({
     accentStorageKey = "theme-accent",
     defaultAccent = "neutral",
     dashboardWallpaperStorageKey = "dashboard-wallpaper",
+    searchUrlTemplateStorageKey = "dashboard-search-url",
+    legacySearchEngineStorageKey = "dashboard-search-engine",
+    defaultSearchUrlTemplate = DEFAULT_SEARCH_URL_TEMPLATE,
     disableTransitionOnChange = true,
     ...props
 }: ThemeProviderProps) {
@@ -132,6 +147,25 @@ export function ThemeProvider({
     const [dashboardWallpaper, setDashboardWallpaperState] = React.useState<
         string | null
     >(() => localStorage.getItem(dashboardWallpaperStorageKey))
+
+    const [searchUrlTemplate, setSearchUrlTemplateState] = React.useState(
+        () => {
+            return getInitialSearchUrlTemplate(
+                searchUrlTemplateStorageKey,
+                legacySearchEngineStorageKey,
+                defaultSearchUrlTemplate
+            )
+        }
+    )
+
+    const setSearchUrlTemplate = React.useCallback(
+        (next: string) => {
+            const trimmed = next.trim()
+            localStorage.setItem(searchUrlTemplateStorageKey, trimmed)
+            setSearchUrlTemplateState(trimmed)
+        },
+        [searchUrlTemplateStorageKey]
+    )
 
     const setDashboardWallpaper = React.useCallback(
         (value: string | null) => {
@@ -264,6 +298,18 @@ export function ThemeProvider({
                         ? event.newValue
                         : null
                 )
+                return
+            }
+
+            if (event.key === searchUrlTemplateStorageKey) {
+                if (
+                    event.newValue !== null &&
+                    event.newValue.trim() !== ""
+                ) {
+                    setSearchUrlTemplateState(event.newValue.trim())
+                } else {
+                    setSearchUrlTemplateState(defaultSearchUrlTemplate)
+                }
             }
         }
 
@@ -276,7 +322,9 @@ export function ThemeProvider({
         accentStorageKey,
         dashboardWallpaperStorageKey,
         defaultAccent,
+        defaultSearchUrlTemplate,
         defaultTheme,
+        searchUrlTemplateStorageKey,
         storageKey,
     ])
 
@@ -288,12 +336,16 @@ export function ThemeProvider({
             setAccent,
             dashboardWallpaper,
             setDashboardWallpaper,
+            searchUrlTemplate,
+            setSearchUrlTemplate,
         }),
         [
             accent,
             dashboardWallpaper,
+            searchUrlTemplate,
             setAccent,
             setDashboardWallpaper,
+            setSearchUrlTemplate,
             setTheme,
             theme,
         ]

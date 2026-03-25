@@ -1,6 +1,15 @@
 import dayjs from "dayjs"
-import { Mic, Moon, Search, Settings, Sun } from "lucide-react"
-import { useEffect, useState } from "react"
+import { Mic, Moon, ScanSearch, Search, Settings, Sun } from "lucide-react"
+import {
+    type ChangeEvent,
+    type FormEvent,
+    useCallback,
+    useEffect,
+    useMemo,
+    useRef,
+    useState,
+    useSyncExternalStore,
+} from "react"
 
 import { DashboardSettingsModal } from "@/components/dashboard/DashboardSettingsModal"
 import { useTheme } from "@/components/theme-provider"
@@ -12,8 +21,26 @@ import {
     TooltipTrigger,
 } from "@/components/ui/tooltip"
 import { MOCK_WEATHER } from "@/data/dashboard-mock"
+import {
+    openGoogleSearchByImage,
+    resolveNavigationHref,
+} from "@/lib/search-engine"
 
 const COLOR_SCHEME_QUERY = "(prefers-color-scheme: dark)"
+
+function subscribePreferredColorScheme(onStoreChange: () => void) {
+    const mq = window.matchMedia(COLOR_SCHEME_QUERY)
+    mq.addEventListener("change", onStoreChange)
+    return () => mq.removeEventListener("change", onStoreChange)
+}
+
+function getPreferredColorSchemeSnapshot(): "dark" | "light" {
+    return window.matchMedia(COLOR_SCHEME_QUERY).matches ? "dark" : "light"
+}
+
+function getPreferredColorSchemeServerSnapshot(): "dark" | "light" {
+    return "light"
+}
 
 function timeOfDayGreeting(hour: number): string {
     if (hour >= 5 && hour < 12) return "Good morning"
@@ -22,13 +49,33 @@ function timeOfDayGreeting(hour: number): string {
     return "Good night"
 }
 
+function getSpeechRecognitionCtor():
+    | (new () => SpeechRecognition)
+    | undefined {
+    if (typeof window === "undefined") {
+        return undefined
+    }
+    return window.SpeechRecognition ?? window.webkitSpeechRecognition
+}
+
 export function DashboardHeader() {
-    const { theme, setTheme } = useTheme()
+    const { theme, setTheme, searchUrlTemplate } = useTheme()
     const [now, setNow] = useState(() => new Date())
     const [settingsOpen, setSettingsOpen] = useState(false)
-    const [resolvedTheme, setResolvedTheme] = useState<"dark" | "light">(
-        "light",
+    const [searchQuery, setSearchQuery] = useState("")
+    const [voiceListening, setVoiceListening] = useState(false)
+    const imageSearchInputRef = useRef<HTMLInputElement>(null)
+    const speechRecognitionRef = useRef<SpeechRecognition | null>(null)
+    const lastVoiceTranscriptRef = useRef("")
+    const voiceUserStoppedRef = useRef(false)
+    const voiceSessionFailedRef = useRef(false)
+    const systemPref = useSyncExternalStore(
+        subscribePreferredColorScheme,
+        getPreferredColorSchemeSnapshot,
+        getPreferredColorSchemeServerSnapshot,
     )
+    const resolvedTheme: "dark" | "light" =
+        theme === "system" ? systemPref : theme
 
     useEffect(() => {
         const id = window.setInterval(() => setNow(new Date()), 1000)
@@ -36,24 +83,111 @@ export function DashboardHeader() {
     }, [])
 
     useEffect(() => {
-        const compute = (): "dark" | "light" =>
-            theme === "system"
-                ? window.matchMedia(COLOR_SCHEME_QUERY).matches
-                    ? "dark"
-                    : "light"
-                : theme
+        return () => {
+            speechRecognitionRef.current?.abort()
+            speechRecognitionRef.current = null
+        }
+    }, [])
 
-        setResolvedTheme(compute())
+    const runSearchNavigation = useCallback(() => {
+        const href = resolveNavigationHref(searchQuery, searchUrlTemplate)
+        if (href !== null) {
+            window.location.assign(href)
+        }
+    }, [searchUrlTemplate, searchQuery])
 
-        if (theme !== "system") {
-            return undefined
+    const handleSearchSubmit = useCallback(
+        (event: FormEvent<HTMLFormElement>) => {
+            event.preventDefault()
+            runSearchNavigation()
+        },
+        [runSearchNavigation],
+    )
+
+    const handleImageSearchPick = useCallback(() => {
+        imageSearchInputRef.current?.click()
+    }, [])
+
+    const handleImageSearchFile = useCallback(
+        (event: ChangeEvent<HTMLInputElement>) => {
+            const file = event.target.files?.[0]
+            event.target.value = ""
+            if (!file?.type.startsWith("image/")) {
+                return
+            }
+            openGoogleSearchByImage(file)
+        },
+        [],
+    )
+
+    const toggleVoiceSearch = useCallback(() => {
+        const Ctor = getSpeechRecognitionCtor()
+        if (Ctor === undefined) {
+            return
         }
 
-        const mediaQuery = window.matchMedia(COLOR_SCHEME_QUERY)
-        const handleChange = () => setResolvedTheme(compute())
-        mediaQuery.addEventListener("change", handleChange)
-        return () => mediaQuery.removeEventListener("change", handleChange)
-    }, [theme])
+        if (speechRecognitionRef.current !== null) {
+            voiceUserStoppedRef.current = true
+            speechRecognitionRef.current.stop()
+            return
+        }
+
+        lastVoiceTranscriptRef.current = ""
+        voiceUserStoppedRef.current = false
+        voiceSessionFailedRef.current = false
+        const recognition = new Ctor()
+        recognition.lang = navigator.language || "en-US"
+        recognition.interimResults = true
+        recognition.continuous = false
+
+        recognition.onresult = (event: SpeechRecognitionEvent) => {
+            let text = ""
+            for (let i = 0; i < event.results.length; i += 1) {
+                text += event.results[i][0].transcript
+            }
+            const trimmed = text.trim()
+            lastVoiceTranscriptRef.current = trimmed
+            setSearchQuery(trimmed)
+        }
+
+        recognition.onerror = () => {
+            voiceSessionFailedRef.current = true
+            setVoiceListening(false)
+            speechRecognitionRef.current = null
+            voiceUserStoppedRef.current = false
+        }
+
+        recognition.onend = () => {
+            setVoiceListening(false)
+            speechRecognitionRef.current = null
+            const userStopped = voiceUserStoppedRef.current
+            const failed = voiceSessionFailedRef.current
+            voiceUserStoppedRef.current = false
+            voiceSessionFailedRef.current = false
+            if (userStopped || failed) {
+                return
+            }
+            const transcript = lastVoiceTranscriptRef.current
+            if (transcript.length > 0) {
+                const href = resolveNavigationHref(
+                    transcript,
+                    searchUrlTemplate,
+                )
+                if (href !== null) {
+                    window.location.assign(href)
+                }
+            }
+        }
+
+        speechRecognitionRef.current = recognition
+        setVoiceListening(true)
+        recognition.start()
+    }, [searchUrlTemplate])
+
+    const speechSupported = useMemo(
+        () => getSpeechRecognitionCtor() !== undefined,
+        [],
+    )
 
     const timeWithPeriod = dayjs(now).format("h:mm A")
     const shortDateLine = dayjs(now).format("dddd, MMM D").toUpperCase()
@@ -157,10 +291,22 @@ export function DashboardHeader() {
                 </p>
 
 
-                <div className="relative mt-8 w-full max-w-xl sm:mt-10">
+                <form
+                    className="relative mt-8 w-full max-w-xl sm:mt-10"
+                    onSubmit={handleSearchSubmit}
+                >
                     <label htmlFor="dashboard-search" className="sr-only">
                         Search the web or type a URL
                     </label>
+                    <input
+                        ref={imageSearchInputRef}
+                        type="file"
+                        accept="image/*"
+                        className="sr-only"
+                        tabIndex={-1}
+                        aria-hidden
+                        onChange={handleImageSearchFile}
+                    />
                     <Search
                         className="pointer-events-none absolute top-1/2 left-5 z-1 size-5 -translate-y-1/2 text-muted-foreground"
                         strokeWidth={2}
@@ -168,27 +314,73 @@ export function DashboardHeader() {
                     />
                     <Input
                         id="dashboard-search"
+                        name="q"
                         type="search"
+                        value={searchQuery}
+                        onChange={(e) => setSearchQuery(e.target.value)}
                         placeholder="Search the web or type a URL"
-                        className="h-auto rounded-full border-border/80 bg-card py-3.5 pr-14 pl-14 text-center shadow-sm placeholder:text-muted-foreground focus-visible:ring-ring/25 sm:text-left"
+                        autoComplete="off"
+                        className="h-auto rounded-full border-border/80 bg-card py-3.5 pr-21 pl-14 text-center shadow-sm placeholder:text-muted-foreground focus-visible:ring-ring/25 sm:text-left"
                     />
-                    <Tooltip>
-                        <TooltipTrigger asChild>
-                            <Button
-                                type="button"
-                                variant="ghost"
-                                size="icon-xs"
-                                className="absolute top-1/2 right-3 z-1 size-8 -translate-y-1/2 rounded-full text-muted-foreground hover:text-foreground"
-                                aria-label="Voice search"
-                            >
-                                <Mic className="size-5" strokeWidth={2} />
-                            </Button>
-                        </TooltipTrigger>
-                        <TooltipContent side="bottom" sideOffset={6}>
-                            Voice search
-                        </TooltipContent>
-                    </Tooltip>
-                </div>
+                    <div className="absolute top-1/2 right-2 z-1 flex -translate-y-1/2 items-center gap-0.5">
+                        <Tooltip>
+                            <TooltipTrigger asChild>
+                                <Button
+                                    type="button"
+                                    variant="ghost"
+                                    size="icon-xs"
+                                    className="size-8 shrink-0 rounded-full text-muted-foreground hover:text-foreground"
+                                    aria-label="Search by image on Google"
+                                    onClick={handleImageSearchPick}
+                                >
+                                    <ScanSearch
+                                        className="size-5"
+                                        strokeWidth={2}
+                                        aria-hidden
+                                    />
+                                </Button>
+                            </TooltipTrigger>
+                            <TooltipContent side="bottom" sideOffset={6}>
+                                Search by image (Google)
+                            </TooltipContent>
+                        </Tooltip>
+                        <Tooltip>
+                            <TooltipTrigger asChild>
+                                <Button
+                                    type="button"
+                                    variant="ghost"
+                                    size="icon-xs"
+                                    className={
+                                        voiceListening
+                                            ? "size-8 shrink-0 rounded-full text-destructive hover:text-destructive"
+                                            : "size-8 shrink-0 rounded-full text-muted-foreground hover:text-foreground"
+                                    }
+                                    aria-label={
+                                        voiceListening
+                                            ? "Stop voice search"
+                                            : "Voice search"
+                                    }
+                                    aria-pressed={voiceListening}
+                                    disabled={!speechSupported}
+                                    onClick={toggleVoiceSearch}
+                                >
+                                    <Mic
+                                        className="size-5"
+                                        strokeWidth={2}
+                                        aria-hidden
+                                    />
+                                </Button>
+                            </TooltipTrigger>
+                            <TooltipContent side="bottom" sideOffset={6}>
+                                {!speechSupported
+                                    ? "Voice search needs a supported browser (e.g. Chrome)"
+                                    : voiceListening
+                                      ? "Stop without searching"
+                                      : "Voice search (then opens results)"}
+                            </TooltipContent>
+                        </Tooltip>
+                    </div>
+                </form>
             </div>
         </header>
     )
