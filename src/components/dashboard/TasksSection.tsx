@@ -1,6 +1,7 @@
 import { Check, Pencil, Plus, Trash2 } from "lucide-react"
 import { useCallback, useRef, useState } from "react"
 
+import { dashboardSectionLabelClassName } from "@/components/dashboard/dashboard-section-label-classes"
 import { Button } from "@/components/ui/button"
 import { MOCK_TODOS, type TodoMock } from "@/data/dashboard-mock"
 import { cn } from "@/lib/utils"
@@ -64,9 +65,7 @@ export function TasksSection() {
     return (
         <article className="flex min-h-0 flex-col rounded-[1.75rem] bg-card p-6 shadow-md ring-1 ring-border/40 lg:p-7">
             <div className="mb-6 flex shrink-0 items-center justify-between gap-3">
-                <h2 className="text-[0.6875rem] font-semibold tracking-[0.14em] text-muted-foreground uppercase">
-                    Focus items
-                </h2>
+                <h2 className={dashboardSectionLabelClassName}>Focus items</h2>
             </div>
             <div
                 className={cn(

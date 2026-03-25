@@ -5,15 +5,14 @@ import {
     TooltipContent,
     TooltipTrigger,
 } from "@/components/ui/tooltip"
+import { dashboardSectionLabelClassName } from "@/components/dashboard/dashboard-section-label-classes"
 import { MOCK_BOOKMARKS } from "@/data/dashboard-mock"
 import { cn } from "@/lib/utils"
 
 export function BookmarksSection() {
     return (
         <article className="rounded-2xl bg-card p-6 shadow-md ring-1 ring-border/40 lg:p-7">
-            <h2 className="text-[0.6875rem] font-semibold tracking-[0.14em] text-muted-foreground uppercase">
-                Bookmarks
-            </h2>
+            <h2 className={dashboardSectionLabelClassName}>Bookmarks</h2>
             <ul className="mt-5 flex flex-col gap-1">
                 {MOCK_BOOKMARKS.map((item) => (
                     <li key={item.id}>

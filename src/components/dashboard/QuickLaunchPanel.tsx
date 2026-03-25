@@ -1,6 +1,7 @@
 import { SquarePen } from "lucide-react"
 import { useState } from "react"
 
+import { dashboardSectionLabelClassName } from "@/components/dashboard/dashboard-section-label-classes"
 import { Button } from "@/components/ui/button"
 import {
     Tooltip,
@@ -8,8 +9,8 @@ import {
     TooltipTrigger,
 } from "@/components/ui/tooltip"
 import {
-    QUICK_LAUNCH_ICON_POOL,
     MOCK_QUICK_LAUNCH,
+    QUICK_LAUNCH_ICON_POOL,
     type QuickLaunchItem,
 } from "@/data/dashboard-mock"
 
@@ -80,11 +81,11 @@ export function QuickLaunchPanel() {
         setDraft(
             items.length > 0
                 ? items.map((item) => ({
-                      id: item.id,
-                      name: item.name,
-                      href: item.href === "#" ? "" : item.href,
-                      icon: item.icon,
-                  }))
+                    id: item.id,
+                    name: item.name,
+                    href: item.href === "#" ? "" : item.href,
+                    icon: item.icon,
+                }))
                 : [{ name: "", href: "" }],
         )
         setModalOpen(true)
@@ -99,7 +100,7 @@ export function QuickLaunchPanel() {
         <>
             <article className="rounded-2xl bg-card p-6 shadow-md ring-1 ring-border/40 lg:p-7">
                 <div className="flex items-center justify-between gap-2">
-                    <h2 className="text-[0.6875rem] font-semibold tracking-[0.14em] text-muted-foreground uppercase">
+                    <h2 className={dashboardSectionLabelClassName}>
                         Jump back in
                     </h2>
                     <Tooltip>
@@ -140,14 +141,14 @@ export function QuickLaunchPanel() {
                                         href={item.href}
                                         {...(item.href.startsWith("http")
                                             ? {
-                                                  target: "_blank",
-                                                  rel: "noreferrer noopener",
-                                              }
+                                                target: "_blank",
+                                                rel: "noreferrer noopener",
+                                            }
                                             : {})}
                                         className="group flex flex-col items-center outline-none focus-visible:ring-2 focus-visible:ring-ring/40"
                                         aria-label={item.name}
                                     >
-                                        <span className="flex size-13 items-center justify-center rounded-xl bg-card shadow-sm ring-1 ring-border/50 transition group-hover:shadow-md sm:size-14">
+                                        <span className="flex size-13 items-center justify-center rounded-full bg-card shadow-sm ring-1 ring-border/50 transition group-hover:shadow-md sm:size-14">
                                             <QuickLaunchIcon item={item} />
                                         </span>
                                     </a>

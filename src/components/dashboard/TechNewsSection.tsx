@@ -1,10 +1,11 @@
+import { dashboardSectionLabelClassName } from "@/components/dashboard/dashboard-section-label-classes"
 import { MOCK_NEWS } from "@/data/dashboard-mock"
 import { cn } from "@/lib/utils"
 
 export function TechNewsSection() {
     return (
         <article className="rounded-[1.75rem] bg-card p-6 shadow-md ring-1 ring-border/40 lg:p-7">
-            <h2 className="text-[0.6875rem] font-semibold tracking-[0.14em] text-muted-foreground uppercase">
+            <h2 className={dashboardSectionLabelClassName}>
                 Market intelligence
             </h2>
             <ul className="mt-6 flex flex-col gap-6">

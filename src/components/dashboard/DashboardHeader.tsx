@@ -1,7 +1,9 @@
 import dayjs from "dayjs"
-import { Mic, Search, Settings, Sun } from "lucide-react"
+import { Mic, Moon, Search, Settings, Sun } from "lucide-react"
 import { useEffect, useState } from "react"
 
+import { DashboardSettingsModal } from "@/components/dashboard/DashboardSettingsModal"
+import { useTheme } from "@/components/theme-provider"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import {
@@ -11,6 +13,8 @@ import {
 } from "@/components/ui/tooltip"
 import { MOCK_WEATHER } from "@/data/dashboard-mock"
 
+const COLOR_SCHEME_QUERY = "(prefers-color-scheme: dark)"
+
 function timeOfDayGreeting(hour: number): string {
     if (hour >= 5 && hour < 12) return "Good morning"
     if (hour >= 12 && hour < 17) return "Good afternoon"
@@ -19,12 +23,37 @@ function timeOfDayGreeting(hour: number): string {
 }
 
 export function DashboardHeader() {
+    const { theme, setTheme } = useTheme()
     const [now, setNow] = useState(() => new Date())
+    const [settingsOpen, setSettingsOpen] = useState(false)
+    const [resolvedTheme, setResolvedTheme] = useState<"dark" | "light">(
+        "light",
+    )
 
     useEffect(() => {
         const id = window.setInterval(() => setNow(new Date()), 1000)
         return () => window.clearInterval(id)
     }, [])
+
+    useEffect(() => {
+        const compute = (): "dark" | "light" =>
+            theme === "system"
+                ? window.matchMedia(COLOR_SCHEME_QUERY).matches
+                    ? "dark"
+                    : "light"
+                : theme
+
+        setResolvedTheme(compute())
+
+        if (theme !== "system") {
+            return undefined
+        }
+
+        const mediaQuery = window.matchMedia(COLOR_SCHEME_QUERY)
+        const handleChange = () => setResolvedTheme(compute())
+        mediaQuery.addEventListener("change", handleChange)
+        return () => mediaQuery.removeEventListener("change", handleChange)
+    }, [theme])
 
     const timeWithPeriod = dayjs(now).format("h:mm A")
     const shortDateLine = dayjs(now).format("dddd, MMM D").toUpperCase()
@@ -55,26 +84,75 @@ export function DashboardHeader() {
                         </span>
                     </span>
                 </p>
-                <Tooltip>
-                    <TooltipTrigger asChild>
-                        <Button
-                            type="button"
-                            variant="ghost"
-                            size="icon"
-                            className="shrink-0 rounded-full text-muted-foreground"
-                            aria-label="Settings"
-                        >
-                            <Settings className="size-5" strokeWidth={2} />
-                        </Button>
-                    </TooltipTrigger>
-                    <TooltipContent side="bottom" sideOffset={6}>
-                        Settings
-                    </TooltipContent>
-                </Tooltip>
+                <div className="flex shrink-0 items-center gap-0.5">
+                    <Tooltip>
+                        <TooltipTrigger asChild>
+                            <Button
+                                type="button"
+                                variant="ghost"
+                                size="icon"
+                                className="rounded-full text-muted-foreground"
+                                aria-label={
+                                    resolvedTheme === "dark"
+                                        ? "Switch to light mode"
+                                        : "Switch to dark mode"
+                                }
+                                onClick={() =>
+                                    setTheme(
+                                        resolvedTheme === "dark"
+                                            ? "light"
+                                            : "dark",
+                                    )
+                                }
+                            >
+                                {resolvedTheme === "dark" ? (
+                                    <Sun
+                                        className="size-5"
+                                        strokeWidth={2}
+                                        aria-hidden
+                                    />
+                                ) : (
+                                    <Moon
+                                        className="size-5"
+                                        strokeWidth={2}
+                                        aria-hidden
+                                    />
+                                )}
+                            </Button>
+                        </TooltipTrigger>
+                        <TooltipContent side="bottom" sideOffset={6}>
+                            {resolvedTheme === "dark"
+                                ? "Light mode"
+                                : "Dark mode"}
+                        </TooltipContent>
+                    </Tooltip>
+                    <Tooltip>
+                        <TooltipTrigger asChild>
+                            <Button
+                                type="button"
+                                variant="ghost"
+                                size="icon"
+                                className="rounded-full text-muted-foreground"
+                                aria-label="Open settings"
+                                onClick={() => setSettingsOpen(true)}
+                            >
+                                <Settings className="size-5" strokeWidth={2} />
+                            </Button>
+                        </TooltipTrigger>
+                        <TooltipContent side="bottom" sideOffset={6}>
+                            Settings
+                        </TooltipContent>
+                    </Tooltip>
+                </div>
             </div>
 
+            <DashboardSettingsModal
+                open={settingsOpen}
+                onOpenChange={setSettingsOpen}
+            />
+
             <div className="mt-10 flex flex-col items-center text-center sm:mt-14">
-                <p className="text-5xl font-bold tracking-tight text-foreground sm:text-6xl md:text-7xl">
+                <p className="text-6xl font-bold tracking-tight text-foreground sm:text-7xl md:text-8xl">
                     {greeting}
                 </p>
 
