@@ -19,6 +19,8 @@ type ThemeProviderProps = {
     /** localStorage key for accent / color preset (default: `theme-accent`). */
     accentStorageKey?: string
     defaultAccent?: AccentId
+    /** Base64 data URL or remote URL for dashboard background; persisted in localStorage. */
+    dashboardWallpaperStorageKey?: string
     disableTransitionOnChange?: boolean
 }
 
@@ -27,6 +29,9 @@ type ThemeProviderState = {
     setTheme: (theme: Theme) => void
     accent: AccentId
     setAccent: (accent: AccentId) => void
+    /** Data URL or absolute URL; `null` clears the wallpaper. */
+    dashboardWallpaper: string | null
+    setDashboardWallpaper: (value: string | null) => void
 }
 
 const COLOR_SCHEME_QUERY = "(prefers-color-scheme: dark)"
@@ -102,6 +107,7 @@ export function ThemeProvider({
     storageKey = "theme",
     accentStorageKey = "theme-accent",
     defaultAccent = "neutral",
+    dashboardWallpaperStorageKey = "dashboard-wallpaper",
     disableTransitionOnChange = true,
     ...props
 }: ThemeProviderProps) {
@@ -122,6 +128,24 @@ export function ThemeProvider({
 
         return defaultAccent
     })
+
+    const [dashboardWallpaper, setDashboardWallpaperState] = React.useState<
+        string | null
+    >(() => localStorage.getItem(dashboardWallpaperStorageKey))
+
+    const setDashboardWallpaper = React.useCallback(
+        (value: string | null) => {
+            if (value === null || value === "") {
+                localStorage.removeItem(dashboardWallpaperStorageKey)
+                setDashboardWallpaperState(null)
+                return
+            }
+
+            localStorage.setItem(dashboardWallpaperStorageKey, value)
+            setDashboardWallpaperState(value)
+        },
+        [dashboardWallpaperStorageKey]
+    )
 
     const setTheme = React.useCallback(
         (nextTheme: Theme) => {
@@ -231,6 +255,15 @@ export function ThemeProvider({
                 } else {
                     setAccentState(defaultAccent)
                 }
+                return
+            }
+
+            if (event.key === dashboardWallpaperStorageKey) {
+                setDashboardWallpaperState(
+                    event.newValue && event.newValue !== ""
+                        ? event.newValue
+                        : null
+                )
             }
         }
 
@@ -239,7 +272,13 @@ export function ThemeProvider({
         return () => {
             window.removeEventListener("storage", handleStorageChange)
         }
-    }, [accentStorageKey, defaultAccent, defaultTheme, storageKey])
+    }, [
+        accentStorageKey,
+        dashboardWallpaperStorageKey,
+        defaultAccent,
+        defaultTheme,
+        storageKey,
+    ])
 
     const value = React.useMemo(
         () => ({
@@ -247,8 +286,17 @@ export function ThemeProvider({
             setTheme,
             accent,
             setAccent,
+            dashboardWallpaper,
+            setDashboardWallpaper,
         }),
-        [accent, setAccent, theme, setTheme]
+        [
+            accent,
+            dashboardWallpaper,
+            setAccent,
+            setDashboardWallpaper,
+            setTheme,
+            theme,
+        ]
     )
 
     return (
