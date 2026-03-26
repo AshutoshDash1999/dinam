@@ -7,12 +7,6 @@ export type NewsItem = {
   thumbClass: string
 }
 
-export type TodoMock = {
-  id: string
-  label: string
-  done: boolean
-}
-
 export type CalendarEventMock = {
   id: string
   timeLabel: string
@@ -62,8 +56,7 @@ export const MOCK_NEWS: NewsItem[] = [
     id: "n1",
     source: "New York Times",
     timeAgo: "12m ago",
-    headline:
-      "The future of generative AI in high-end industrial design",
+    headline: "The future of generative AI in high-end industrial design",
     thumbClass: "bg-chart-1/45 dark:bg-chart-1/35",
   },
   {
@@ -77,16 +70,9 @@ export const MOCK_NEWS: NewsItem[] = [
     id: "n3",
     source: "The Verge",
     timeAgo: "3h ago",
-    headline:
-      "Spatial audio and the revolution of personal workspace",
+    headline: "Spatial audio and the revolution of personal workspace",
     thumbClass: "bg-chart-3/45 dark:bg-chart-3/35",
   },
-]
-
-export const MOCK_TODOS: TodoMock[] = [
-  { id: "t1", label: "Finalize design system documentation", done: false },
-  { id: "t2", label: "Review Q4 production schedule", done: false },
-  { id: "t3", label: "Prepare atelier portfolio update", done: false },
 ]
 
 export const MOCK_CALENDAR: CalendarEventMock[] = [
