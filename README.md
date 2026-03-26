@@ -4,6 +4,8 @@ Dinam is a **Chrome extension** that replaces your **new tab** page with a perso
 
 Data for bookmarks, tasks, news, and quick launch items is currently driven by mock modules under `src/data/`—a natural place to swap in real APIs, `chrome.storage`, or other persistence later.
 
+If Dinam is useful to you, **star this repository on GitHub** — it helps others discover the project and keeps us motivated to improve it.
+
 ## Features
 
 - **New tab override** — The dashboard opens whenever you open a new tab (once packaged as an extension).
