@@ -150,6 +150,12 @@
   }
 }
 
+@layer components {
+  .dashboard-section-label {
+    @apply text-[0.6875rem] font-medium uppercase tracking-[0.2em] text-muted-foreground/65;
+  }
+}
+
 @layer utilities {
   .animate-dashboard-blob-1 {
     animation: dashboard-blob-1 34s ease-in-out infinite;
