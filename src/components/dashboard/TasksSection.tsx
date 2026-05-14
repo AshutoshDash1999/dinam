@@ -1,5 +1,5 @@
 import { Check, Pencil, Plus, Trash2 } from "lucide-react"
-import { useCallback, useRef, useState } from "react"
+import { useCallback, useEffect, useRef, useState } from "react"
 
 import { dashboardSectionLabelClassName } from "@/components/dashboard/dashboard-section-label-classes"
 import { Button } from "@/components/ui/button"
@@ -11,16 +11,51 @@ type TodoMock = {
     done: boolean
 }
 
+const TASKS_STORAGE_KEY = "dashboard-focus-items"
+
 function newTodoId() {
     return `t-${crypto.randomUUID()}`
 }
 
 export function TasksSection() {
-    const [todos, setTodos] = useState<TodoMock[]>([])
+    const [todos, setTodos] = useState<TodoMock[]>(() => {
+        try {
+            const stored = localStorage.getItem(TASKS_STORAGE_KEY)
+
+            if (!stored) return []
+
+            const parsed: unknown = JSON.parse(stored)
+
+            if (!Array.isArray(parsed)) return []
+
+            return parsed.filter(
+                (todo): todo is TodoMock =>
+                    typeof todo === "object" &&
+                    todo !== null &&
+                    typeof todo.id === "string" &&
+                    typeof todo.label === "string" &&
+                    typeof todo.done === "boolean",
+            )
+        } catch {
+            return []
+        }
+    })
+
     const [newTaskLabel, setNewTaskLabel] = useState("")
     const [editingId, setEditingId] = useState<string | null>(null)
     const [editLabel, setEditLabel] = useState("")
     const skipEditCommitOnBlur = useRef(false)
+
+    useEffect(() => {
+        try {
+            localStorage.setItem(
+                TASKS_STORAGE_KEY,
+                JSON.stringify(todos),
+            )
+        } catch {
+            // ignore storage errors
+        }
+    }, [todos])
 
     const toggleTodo = (id: string) => {
         setTodos((prev) =>
@@ -30,8 +65,18 @@ export function TasksSection() {
 
     const addTask = () => {
         const label = newTaskLabel.trim()
+
         if (!label) return
-        setTodos((prev) => [...prev, { id: newTodoId(), label, done: false }])
+
+        setTodos((prev) => [
+            ...prev,
+            {
+                id: newTodoId(),
+                label,
+                done: false,
+            },
+        ])
+
         setNewTaskLabel("")
     }
 
@@ -47,15 +92,20 @@ export function TasksSection() {
 
     const commitEditTodo = useCallback(() => {
         const id = editingId
+
         if (!id) return
+
         const label = editLabel.trim()
+
         if (!label) {
             setEditingId(null)
             return
         }
+
         setTodos((prev) =>
             prev.map((t) => (t.id === id ? { ...t, label } : t)),
         )
+
         setEditingId(null)
     }, [editLabel, editingId])
 
@@ -64,14 +114,18 @@ export function TasksSection() {
             skipEditCommitOnBlur.current = false
             return
         }
+
         commitEditTodo()
     }
 
     return (
         <article className="flex min-h-0 flex-col rounded-[1.75rem] bg-card p-6 shadow-md ring-1 ring-border/40 lg:p-7">
             <div className="mb-6 flex shrink-0 items-center justify-between gap-3">
-                <h2 className={dashboardSectionLabelClassName}>Focus items</h2>
+                <h2 className={dashboardSectionLabelClassName}>
+                    Focus items
+                </h2>
             </div>
+
             <div
                 className={cn(
                     "min-h-0 flex-1",
@@ -110,6 +164,7 @@ export function TasksSection() {
                                             />
                                         ) : null}
                                     </button>
+
                                     {editingId === todo.id ? (
                                         <input
                                             type="text"
@@ -122,6 +177,7 @@ export function TasksSection() {
                                                 if (e.key === "Enter") {
                                                     e.currentTarget.blur()
                                                 }
+
                                                 if (e.key === "Escape") {
                                                     skipEditCommitOnBlur.current = true
                                                     setEditingId(null)
@@ -145,6 +201,7 @@ export function TasksSection() {
                                             {todo.label}
                                         </button>
                                     )}
+
                                     <div
                                         className={cn(
                                             "flex shrink-0 items-center gap-0.5 transition-opacity",
@@ -159,10 +216,14 @@ export function TasksSection() {
                                             aria-label="Edit task"
                                             onClick={(e) => {
                                                 e.stopPropagation()
+
                                                 if (editingId === todo.id) {
                                                     setEditingId(null)
                                                 } else {
-                                                    startEditTodo(todo.id, todo.label)
+                                                    startEditTodo(
+                                                        todo.id,
+                                                        todo.label,
+                                                    )
                                                 }
                                             }}
                                         >
@@ -171,6 +232,7 @@ export function TasksSection() {
                                                 strokeWidth={2}
                                             />
                                         </button>
+
                                         <button
                                             type="button"
                                             className="rounded-lg p-1.5 text-muted-foreground transition-colors hover:bg-destructive/10 hover:text-destructive"
@@ -192,6 +254,7 @@ export function TasksSection() {
                     </ul>
                 )}
             </div>
+
             <div className="mt-4 shrink-0 border-t border-border/50 pt-4">
                 <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
                     <input
@@ -205,6 +268,7 @@ export function TasksSection() {
                         className="min-w-0 flex-1 rounded-xl border border-border/80 bg-card px-3 py-2 text-sm text-card-foreground outline-none placeholder:text-muted-foreground focus-visible:border-input focus-visible:ring-2 focus-visible:ring-ring/25"
                         aria-label="New task"
                     />
+
                     <Button
                         type="button"
                         variant="ghost"
