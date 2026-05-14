@@ -4,7 +4,7 @@ import { cn } from "@/lib/utils"
 
 export function TechNewsSection() {
     return (
-        <article className="rounded-[1.75rem] bg-card p-6 shadow-md ring-1 ring-border/40 lg:p-7">
+        <article className="rounded-[1.75rem] bg-card p-6 shadow-[0_8px_30px_rgba(0,0,0,0.08)] dark:shadow-[0_8px_30px_rgba(0,0,0,0.45)] transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_12px_40px_rgba(0,0,0,0.12)] dark:hover:shadow-[0_12px_40px_rgba(0,0,0,0.6)] ring-1 ring-border/40 lg:p-7">
             <h2 className={dashboardSectionLabelClassName}>
                 Market intelligence
             </h2>

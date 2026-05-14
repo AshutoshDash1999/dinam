@@ -9,7 +9,7 @@ export function QuoteCard() {
     const { text, author } = useStoicQuote()
 
     return (
-        <article className="rounded-[1.75rem] bg-card p-7 shadow-md ring-1 ring-border/40 sm:p-8">
+        <article className="rounded-[1.75rem] bg-card p-7 shadow-[0_8px_30px_rgba(0,0,0,0.08)] dark:shadow-[0_8px_30px_rgba(0,0,0,0.45)] transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_12px_40px_rgba(0,0,0,0.12)] dark:hover:shadow-[0_12px_40px_rgba(0,0,0,0.6)] ring-1 ring-border/40 sm:p-8">
             <h2 className={`${dashboardSectionLabelClassName} mb-3`}>Quote of the day</h2>
             <blockquote>
                 <p className="text-xl leading-relaxed font-bold tracking-tight text-card-foreground sm:text-2xl">
