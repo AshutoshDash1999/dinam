@@ -67,30 +67,44 @@ export async function fetchStoicQuoteFromApi(): Promise<{
     quote: string
     author: string
 } | null> {
-    const res = await fetch(STOIC_QUOTE_API_URL)
-    if (!res.ok) return null
-    const json: unknown = await res.json()
-    if (
-        typeof json !== "object" ||
-        json === null ||
-        !("data" in json) ||
-        typeof (json as { data?: unknown }).data !== "object" ||
-        (json as { data: unknown }).data === null
-    ) {
+    try {
+        const res = await fetch(STOIC_QUOTE_API_URL)
+
+        if (!res.ok) return null
+
+        const json: unknown = await res.json()
+
+        if (
+            typeof json !== "object" ||
+            json === null ||
+            !("data" in json) ||
+            typeof (json as { data?: unknown }).data !== "object" ||
+            (json as { data: unknown }).data === null
+        ) {
+            return null
+        }
+
+        const data = (json as { data: Record<string, unknown> }).data
+        const quote = data.quote
+        const author = data.author
+
+        if (
+            typeof quote !== "string" ||
+            typeof author !== "string" ||
+            quote.trim() === "" ||
+            author.trim() === ""
+        ) {
+            return null
+        }
+
+        return {
+            quote: quote.trim(),
+            author: author.trim(),
+        }
+    } catch (error) {
+        console.error("Failed to fetch stoic quote:", error)
         return null
     }
-    const data = (json as { data: Record<string, unknown> }).data
-    const quote = data.quote
-    const author = data.author
-    if (
-        typeof quote !== "string" ||
-        typeof author !== "string" ||
-        quote.trim() === "" ||
-        author.trim() === ""
-    ) {
-        return null
-    }
-    return { quote: quote.trim(), author: author.trim() }
 }
 
 function initialDisplayQuote(): { text: string; author: string } {
