@@ -1,4 +1,3 @@
-import dayjs from "dayjs"
 import {
     MessageSquare,
     Mic,
@@ -20,6 +19,7 @@ import {
 } from "react"
 
 import { DashboardSettingsModal } from "@/components/dashboard/DashboardSettingsModal"
+import { LiveClock } from "@/components/dashboard/LiveClock"
 import { useTheme } from "@/components/theme-provider"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -28,12 +28,10 @@ import {
     TooltipContent,
     TooltipTrigger,
 } from "@/components/ui/tooltip"
-import { MOCK_WEATHER } from "@/data/dashboard-mock"
 import {
     openGoogleSearchByImage,
     resolveNavigationHref,
 } from "@/lib/search-engine"
-import { getCreativeGreeting } from "@/utils/greetings"
 
 const COLOR_SCHEME_QUERY = "(prefers-color-scheme: dark)"
 
@@ -50,7 +48,6 @@ function getPreferredColorSchemeSnapshot(): "dark" | "light" {
 function getPreferredColorSchemeServerSnapshot(): "dark" | "light" {
     return "light"
 }
-
 function getSpeechRecognitionCtor():
     | (new () => SpeechRecognition)
     | undefined {
@@ -66,7 +63,6 @@ type DashboardHeaderProps = {
 
 export function DashboardHeader({ onOpenAssistant }: DashboardHeaderProps) {
     const { theme, setTheme, searchUrlTemplate } = useTheme()
-    const [now, setNow] = useState(() => new Date())
     const [settingsOpen, setSettingsOpen] = useState(false)
     const [searchQuery, setSearchQuery] = useState("")
     const [voiceListening, setVoiceListening] = useState(false)
@@ -82,11 +78,6 @@ export function DashboardHeader({ onOpenAssistant }: DashboardHeaderProps) {
     )
     const resolvedTheme: "dark" | "light" =
         theme === "system" ? systemPref : theme
-
-    useEffect(() => {
-        const id = window.setInterval(() => setNow(new Date()), 1000)
-        return () => window.clearInterval(id)
-    }, [])
 
     useEffect(() => {
         return () => {
@@ -195,38 +186,10 @@ export function DashboardHeader({ onOpenAssistant }: DashboardHeaderProps) {
         [],
     )
 
-    // Maintained dayjs formatting configurations requested by reviewer
-    const timeWithPeriod = dayjs(now).format("h:mm A")
-    const shortDateLine = dayjs(now).format("dddd, MMM D").toUpperCase()
-    
-    // Memoized tracking dependency array by the exact hour to prevent jumping text variations on clock ticks
-    const greeting = useMemo(() => getCreativeGreeting(), [now.getHours()])
-
     return (
         <header className="w-full">
             <div className="flex items-start justify-between gap-4 px-1">
-                <p
-                    className="flex max-w-[min(100%,36rem)] flex-wrap items-center gap-x-1.5 gap-y-1 text-[0.8125rem] font-medium tracking-wide text-primary/70"
-                    role="status"
-                    aria-label={`${timeWithPeriod}, ${shortDateLine}, ${MOCK_WEATHER.city}, ${MOCK_WEATHER.summary}`}
-                >
-                    <span className="text-foreground/90">{timeWithPeriod}</span>
-                    <span className="text-primary/55">•</span>
-                    <span>{shortDateLine}</span>
-                    <span className="text-primary/55">•</span>
-                    <span className="inline-flex items-center gap-1 text-foreground/85">
-                        <Sun
-                            className="size-3.5 shrink-0 text-chart-1"
-                            strokeWidth={2}
-                            aria-hidden
-                        />
-                        {MOCK_WEATHER.city}
-                        <span className="text-primary/55">·</span>
-                        <span className="text-muted-foreground">
-                            {MOCK_WEATHER.summary}
-                        </span>
-                    </span>
-                </p>
+                <LiveClock variant="status" />
                 <div className="flex shrink-0 items-center gap-0.5">
                     <Tooltip>
                         <TooltipTrigger asChild>
@@ -317,15 +280,7 @@ export function DashboardHeader({ onOpenAssistant }: DashboardHeaderProps) {
             />
 
             <div className="mt-10 flex flex-col items-center text-center sm:mt-14">
-                {/* Optimized spacing properties to compact vertical margins for wrapped lines */}
-                <div className="w-full max-w-4xl min-h-[7rem] flex items-center justify-center">
-                    <p className="inline-flex flex-wrap items-center justify-center gap-x-4 gap-y-1 text-center text-5xl font-bold tracking-tight text-foreground leading-none sm:text-6xl md:text-7xl lg:text-8xl select-none">
-                        <span className="inline-block max-w-3xl text-balance leading-tight">{greeting.text}</span>
-                        <span className="inline-block shrink-0 animate-pulse align-middle text-5xl sm:text-6xl md:text-7xl lg:text-8xl manual-emoji-reset leading-none">
-                            {greeting.emoji}
-                        </span>
-                    </p>
-                </div>
+                <LiveClock variant="greeting" />
 
                 <form
                     className="relative mt-6 w-full max-w-xl sm:mt-8"
