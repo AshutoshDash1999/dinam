@@ -67,7 +67,7 @@ export function QuickLaunchPanel() {
             href: item.href === "#" ? "" : item.href,
             icon: item.icon,
           }))
-        : [{ name: "", href: "" }]
+        : [{ id: `q-${crypto.randomUUID()}`, name: "", href: "" }]
     )
     setModalOpen(true)
   }

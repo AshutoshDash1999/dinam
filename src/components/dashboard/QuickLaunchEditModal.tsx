@@ -18,7 +18,7 @@ import type { QuickLaunchIconKey } from "@/data/dashboard-mock"
 const MAX_QUICK_LAUNCH_LINKS = 8
 
 export type QuickLaunchDraftSlot = {
-  id?: string
+  id: string
   name: string
   href: string
   icon?: QuickLaunchIconKey
@@ -46,7 +46,7 @@ export function QuickLaunchEditModal({
   const addSlot = () => {
     onDraftChange((prev) => {
       if (prev.length >= MAX_QUICK_LAUNCH_LINKS) return prev
-      return [...prev, { name: "", href: "" }]
+      return [...prev, { id: `q-${crypto.randomUUID()}`, name: "", href: "" }]
     })
   }
 
@@ -71,7 +71,7 @@ export function QuickLaunchEditModal({
         <div className="mt-4 max-h-[min(50vh,20rem)] space-y-3 overflow-y-auto pr-1">
           {draft.map((slot, index) => (
             <div
-              key={slot.id ?? `draft-${index}`}
+              key={slot.id}
               className="flex flex-col gap-2 sm:flex-row sm:items-end"
             >
               <div className="grid min-w-0 flex-1 grid-cols-1 gap-2 sm:grid-cols-2">
