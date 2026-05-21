@@ -164,14 +164,16 @@ export function TasksSection() {
             if (e.key === "Enter") addTask()
           }}
           placeholder="New task title…"
+          aria-label="New task title"
           className="min-w-0 flex-1 rounded-xl border border-border/80 bg-card px-3 py-2 text-sm text-card-foreground outline-none"
         />
 
         <div className="flex flex-wrap items-center gap-3 rounded-xl border border-border/30 bg-muted/40 p-2.5">
           <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
             <Calendar className="size-3.5 text-primary/70" />
-            <span>Start:</span>
+            <label htmlFor="new-task-start-date">Start:</label>
             <input
+              id="new-task-start-date"
               type="date"
               value={startDate}
               onChange={(e) => setStartDate(e.target.value)}
@@ -180,8 +182,9 @@ export function TasksSection() {
           </div>
           <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
             <Calendar className="size-3.5 text-destructive/70" />
-            <span>Finish:</span>
+            <label htmlFor="new-task-due-date">Finish:</label>
             <input
+              id="new-task-due-date"
               type="date"
               value={dueDate}
               onChange={(e) => setDueDate(e.target.value)}
@@ -197,6 +200,7 @@ export function TasksSection() {
               step="10"
               value={progress}
               onChange={(e) => setProgress(parseInt(e.target.value))}
+              aria-label="New task progress"
               className="h-1 w-16 appearance-none rounded-lg bg-border accent-primary"
             />
             <span className="min-w-[1.5rem] text-right font-mono text-[11px]">

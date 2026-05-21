@@ -88,6 +88,7 @@ export function TaskItem({
               onKeyDown={(e) => {
                 if (e.key === "Enter") onCommitEdit()
               }}
+              aria-label="Edit task title"
               className="min-w-0 flex-1 rounded-lg border border-border bg-card px-3 py-1 text-sm font-medium text-card-foreground outline-none focus:border-primary"
               autoFocus
             />
@@ -170,8 +171,9 @@ export function TaskItem({
         <div className="mt-1 flex flex-wrap items-center gap-4 rounded-xl border border-border/40 bg-background/50 p-2.5">
           <div className="flex items-center gap-2 text-xs text-muted-foreground">
             <Calendar className="size-3.5 text-primary/70" />
-            <span>Start:</span>
+            <label htmlFor={`edit-start-date-${todo.id}`}>Start:</label>
             <input
+              id={`edit-start-date-${todo.id}`}
               type="date"
               value={editStartDate}
               onChange={(e) => setEditStartDate(e.target.value)}
@@ -180,8 +182,9 @@ export function TaskItem({
           </div>
           <div className="flex items-center gap-2 text-xs text-muted-foreground">
             <Calendar className="size-3.5 text-destructive/70" />
-            <span>Finish:</span>
+            <label htmlFor={`edit-due-date-${todo.id}`}>Finish:</label>
             <input
+              id={`edit-due-date-${todo.id}`}
               type="date"
               value={editDueDate}
               onChange={(e) => setEditDueDate(e.target.value)}
