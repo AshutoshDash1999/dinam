@@ -1,6 +1,7 @@
 import { useState } from "react"
 
 import { AssistantPanel } from "@/components/dashboard/AssistantPanel"
+import { BackgroundBlobs } from "@/components/dashboard/BackgroundBlobs"
 import { BookmarksSection } from "@/components/dashboard/BookmarksSection"
 import { DashboardHeader } from "@/components/dashboard/DashboardHeader"
 import { QuoteCard } from "@/components/dashboard/QuoteCard"
@@ -37,7 +38,9 @@ const App = () => {
             className="pointer-events-none fixed inset-0 -z-10 bg-linear-to-b from-background/88 via-background/76 to-background/92"
           />
         </>
-      ) : null}
+      ) : (
+        <BackgroundBlobs />
+      )}
       <div className="relative z-0 mx-auto w-full max-w-6xl px-6 pt-8 pb-10 lg:px-8 lg:pb-12">
         <DashboardHeader onOpenAssistant={() => setAssistantOpen(true)} />
 

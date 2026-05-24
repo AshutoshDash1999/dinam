@@ -60,3 +60,10 @@ export const MOCK_BOOKMARKS: BookmarkItem[] = [
 
 export const MOCK_STREAK_DAYS = 5
 
+export const MOCK_WEATHER = {
+  city: "San Francisco",
+  temperature: 20,
+  weatherCode: 0,
+  summary: "Clear sky",
+} as const
+

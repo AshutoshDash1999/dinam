@@ -1,3 +1,4 @@
+import * as React from "react"
 import { useMemo } from "react"
 
 import { cn } from "@/lib/utils"
@@ -45,7 +46,7 @@ function createBackgroundBlobs(): BackgroundBlob[] {
   }))
 }
 
-export function BackgroundBlobs() {
+export const BackgroundBlobs = React.memo(function BackgroundBlobs() {
   const backgroundBlobs = useMemo(() => createBackgroundBlobs(), [])
 
   return (
@@ -75,4 +76,4 @@ export function BackgroundBlobs() {
       ))}
     </div>
   )
-}
+})
