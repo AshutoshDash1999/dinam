@@ -23,6 +23,11 @@ export const MOCK_QUOTE = {
   author: "Charles Eames",
 } as const
 
+export const MOCK_WEATHER = {
+  city: "San Francisco",
+  summary: "Sunny, 68°",
+} as const
+
 export const MOCK_CALENDAR: CalendarEventMock[] = [
   { id: "c1", timeLabel: "10:00 AM", title: "Design sync — Dinam new tab" },
   { id: "c2", timeLabel: "2:30 PM", title: "Focus block — deep work" },

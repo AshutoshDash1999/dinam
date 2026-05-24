@@ -53,6 +53,7 @@ export function AssistantPanel({ open, onOpenChange }: AssistantPanelProps) {
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const listRef = useRef<HTMLDivElement>(null)
+  const abortControllerRef = useRef<AbortController | null>(null)
 
   const ctx: AgentExecutionContext = useMemo(
     () => ({
@@ -96,8 +97,16 @@ export function AssistantPanel({ open, onOpenChange }: AssistantPanelProps) {
     return () => window.removeEventListener("keydown", onKey)
   }, [open, onOpenChange])
 
+  useEffect(() => {
+    return () => {
+      if (abortControllerRef.current) {
+        abortControllerRef.current.abort()
+      }
+    }
+  }, [])
+
   const runAgent = useCallback(
-    async (historyIncludingLatestUser: ChatTurn[]) => {
+    async (historyIncludingLatestUser: ChatTurn[], signal?: AbortSignal) => {
       if (!baseUrl.trim() || !isAiProviderBaseUrlValid(baseUrl)) {
         throw new Error(
           "Configure a valid chat API base URL under Settings → Assistant."
@@ -124,6 +133,19 @@ export function AssistantPanel({ open, onOpenChange }: AssistantPanelProps) {
           model,
           messages: apiMessages,
           tools: AGENT_TOOL_DEFINITIONS,
+          onChunk: (chunk) => {
+            setTurns((prev) => {
+              const next = [...prev]
+              if (next.length > 0 && next[next.length - 1].role === "assistant") {
+                next[next.length - 1] = {
+                  ...next[next.length - 1],
+                  content: next[next.length - 1].content + chunk,
+                }
+              }
+              return next
+            })
+          },
+          signal,
         })
 
         const message = res.choices?.[0]?.message
@@ -183,27 +205,49 @@ export function AssistantPanel({ open, onOpenChange }: AssistantPanelProps) {
   const send = useCallback(async () => {
     const text = input.trim()
     if (!text || busy) return
+
+    if (abortControllerRef.current) {
+      abortControllerRef.current.abort()
+    }
+    const controller = new AbortController()
+    abortControllerRef.current = controller
+
     setInput("")
     setError(null)
     const historyAfterUser: ChatTurn[] = [
       ...turns,
       { role: "user", content: text },
     ]
-    setTurns(historyAfterUser)
+    setTurns([...historyAfterUser, { role: "assistant", content: "" }])
     setBusy(true)
     try {
-      const reply = await runAgent(historyAfterUser)
-      setTurns((prev) => [...prev, { role: "assistant", content: reply }])
+      const reply = await runAgent(historyAfterUser, controller.signal)
+      setTurns((prev) => {
+        const next = [...prev]
+        if (next.length > 0 && next[next.length - 1].role === "assistant") {
+          next[next.length - 1] = {
+            ...next[next.length - 1],
+            content: reply,
+          }
+        }
+        return next
+      })
     } catch (e) {
+      if (e instanceof Error && e.name === "AbortError") {
+        return
+      }
       const msg = e instanceof Error ? e.message : "Something went wrong."
       setError(msg)
-      setTurns((prev) => [
-        ...prev,
-        {
-          role: "assistant",
-          content: `Could not complete that: ${msg}`,
-        },
-      ])
+      setTurns((prev) => {
+        const next = [...prev]
+        if (next.length > 0 && next[next.length - 1].role === "assistant") {
+          next[next.length - 1] = {
+            ...next[next.length - 1],
+            content: `Could not complete that: ${msg}`,
+          }
+        }
+        return next
+      })
     } finally {
       setBusy(false)
     }
