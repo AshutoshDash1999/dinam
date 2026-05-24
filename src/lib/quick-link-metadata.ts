@@ -8,12 +8,29 @@ export type QuickLinkMetadata = {
  * Normalizes a raw user-entered URL by prepending https:// if needed.
  */
 function normalizeUrl(raw: string): string {
-  let url = raw.trim()
-  if (!url) return ""
-  if (!url.startsWith("http://") && !url.startsWith("https://")) {
-    url = `https://${url}`
+  const trimmed = raw.trim()
+  if (!trimmed) return ""
+
+  const withProtocol = /^[a-z0-9+.-]+:/i.test(trimmed)
+    ? trimmed
+    : `https://${trimmed}`
+
+  try {
+    const u = new URL(withProtocol)
+    const p = u.protocol.toLowerCase()
+
+    if (
+      p === "javascript:" ||
+      p === "vbscript:" ||
+      p === "data:" ||
+      p === "file:"
+    ) {
+      return ""
+    }
+    return u.href
+  } catch {
+    return ""
   }
-  return url
 }
 
 /**

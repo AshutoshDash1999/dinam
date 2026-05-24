@@ -225,8 +225,8 @@ export function DashboardStateProvider({ children }: { children: ReactNode }) {
 
   const addBookmark = useCallback((title: string, href: string) => {
     const t = title.trim()
-    const h = href.trim()
-    if (!t || !h) return ""
+    const h = normalizeQuickLaunchHref(href)
+    if (!t || !h || h === "#") return ""
     const id = newBookmarkId()
     setBookmarksState((prev) => {
       const next = [...prev, { id, title: t, href: h }]
