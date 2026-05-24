@@ -38,7 +38,8 @@ export function getInitialSearchUrlTemplate(
 }
 
 export function isSearchUrlTemplateValid(template: string): boolean {
-  return template.trim().includes("%s")
+  const trimmed = template.trim()
+  return trimmed.includes("%s") && /^https?:\/\//i.test(trimmed)
 }
 
 export function buildSearchUrlFromTemplate(
@@ -73,6 +74,10 @@ function hrefIfSingleTokenUrl(trimmed: string): string | null {
       }
     }
     if (/^[a-z][a-z0-9+.-]*:/i.test(trimmed)) {
+      const p = u.protocol.toLowerCase()
+      if (p === "javascript:" || p === "vbscript:" || p === "data:") {
+        return null
+      }
       return trimmed
     }
   } catch {
