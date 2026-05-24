@@ -84,7 +84,7 @@ export async function requestChatCompletion(params: {
   let buffer = ""
 
   try {
-    while (true) {
+    parseLoop: while (true) {
       const { done, value } = await reader.read()
       if (done) break
 
@@ -98,7 +98,7 @@ export async function requestChatCompletion(params: {
 
         const dataStr = trimmed.slice(5).trim()
         if (dataStr === "[DONE]") {
-          break
+          break parseLoop
         }
 
         try {

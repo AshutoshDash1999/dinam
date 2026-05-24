@@ -98,12 +98,15 @@ export function AssistantPanel({ open, onOpenChange }: AssistantPanelProps) {
   }, [open, onOpenChange])
 
   useEffect(() => {
+    if (!open && abortControllerRef.current) {
+      abortControllerRef.current.abort()
+    }
     return () => {
       if (abortControllerRef.current) {
         abortControllerRef.current.abort()
       }
     }
-  }, [])
+  }, [open])
 
   const runAgent = useCallback(
     async (historyIncludingLatestUser: ChatTurn[], signal?: AbortSignal) => {
