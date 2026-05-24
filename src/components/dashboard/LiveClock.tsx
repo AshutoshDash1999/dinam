@@ -1,8 +1,5 @@
 import dayjs from "dayjs"
-import { Sun } from "lucide-react"
 import { useEffect, useState } from "react"
-
-import { MOCK_WEATHER } from "@/data/dashboard-mock"
 
 /**
  * Fully self-contained live clock status bar.
@@ -26,22 +23,11 @@ export function LiveClock() {
     <p
       className="flex max-w-[min(100%,36rem)] flex-wrap items-center gap-x-1.5 gap-y-1 text-[0.8125rem] font-medium tracking-wide text-primary/70"
       role="status"
-      aria-label={`${timeWithPeriod}, ${shortDateLine}, ${MOCK_WEATHER.city}, ${MOCK_WEATHER.summary}`}
+      aria-label={`${timeWithPeriod}, ${shortDateLine}`}
     >
       <span className="text-foreground/90">{timeWithPeriod}</span>
       <span className="text-primary/55">•</span>
       <span>{shortDateLine}</span>
-      <span className="text-primary/55">•</span>
-      <span className="inline-flex items-center gap-1 text-foreground/85">
-        <Sun
-          className="size-3.5 shrink-0 text-chart-1"
-          strokeWidth={2}
-          aria-hidden
-        />
-        {MOCK_WEATHER.city}
-        <span className="text-primary/55">·</span>
-        <span className="text-muted-foreground">{MOCK_WEATHER.summary}</span>
-      </span>
     </p>
   )
 }

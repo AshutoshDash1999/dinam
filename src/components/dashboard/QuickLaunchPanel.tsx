@@ -33,7 +33,7 @@ async function draftToItems(
     if (!titleRaw && url === "#") continue
 
     const existing = existingItems.find((e) => e.id === slot.id)
-    
+
     let title = titleRaw
     let description = slot.description
     let favicon = slot.favicon
@@ -151,7 +151,7 @@ export function QuickLaunchPanel() {
             {quickLaunchItems.map((item) => (
               <Tooltip key={item.id}>
                 <TooltipTrigger asChild>
-                    <a
+                  <a
                     href={item.url}
                     {...(item.url.startsWith("http")
                       ? {

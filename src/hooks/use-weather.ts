@@ -19,8 +19,7 @@ async function reverseGeocode(
     const data = await res.json()
     const addr = data.address
     if (!addr) return "Your location"
-    const city =
-      addr.city || addr.town || addr.village || addr.county || ""
+    const city = addr.city || addr.town || addr.village || addr.county || ""
     const state = addr.state || ""
     if (city && state) return `${city}, ${state}`
     return city || state || "Your location"

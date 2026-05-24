@@ -177,8 +177,7 @@ export const AGENT_TOOL_DEFINITIONS: Record<string, unknown>[] = [
     type: "function",
     function: {
       name: "dashboard_add_quick_launch",
-      description:
-        "Add a shortcut to the quick-launch grid.",
+      description: "Add a shortcut to the quick-launch grid.",
       parameters: {
         type: "object",
         properties: {

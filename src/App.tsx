@@ -45,7 +45,6 @@ const App = () => {
           <div className="flex flex-col gap-6 lg:col-span-3">
             <QuickLaunchPanel />
             <BookmarksSection />
-
           </div>
           <div className="flex flex-col gap-6 lg:col-span-5">
             <QuoteCard />
