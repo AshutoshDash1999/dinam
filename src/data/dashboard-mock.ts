@@ -18,6 +18,11 @@ export type BookmarkItem = {
   href: string
 }
 
+export const MOCK_WEATHER = {
+  city: "San Francisco, CA",
+  summary: "Sunny 68°F",
+} as const
+
 export const MOCK_QUOTE = {
   text: "The details are not the details. They make the design.",
   author: "Charles Eames",
