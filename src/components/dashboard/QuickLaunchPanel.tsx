@@ -11,8 +11,10 @@ import {
 import { Globe } from "lucide-react"
 import { fetchQuickLinkMetadata, normalizeUrl } from "@/lib/quick-link-metadata"
 import { cn } from "@/lib/utils"
-import { useDashboardState } from "@/context/dashboard-state"
-import type { QuickLaunchItem } from "@/data/dashboard-mock"
+import {
+  useDashboardState,
+  type QuickLaunchItem,
+} from "@/context/dashboard-state"
 
 import {
   QuickLaunchEditModal,
@@ -33,7 +35,7 @@ async function draftToItems(
     if (!titleRaw && url === "#") continue
 
     const existing = existingItems.find((e) => e.id === slot.id)
-    
+
     let title = titleRaw
     let description = slot.description
     let favicon = slot.favicon
@@ -151,7 +153,7 @@ export function QuickLaunchPanel() {
             {quickLaunchItems.map((item) => (
               <Tooltip key={item.id}>
                 <TooltipTrigger asChild>
-                    <a
+                  <a
                     href={item.url}
                     {...(item.url.startsWith("http")
                       ? {

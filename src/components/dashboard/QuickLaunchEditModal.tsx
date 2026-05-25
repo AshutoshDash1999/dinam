@@ -14,7 +14,6 @@ import {
 } from "@/components/ui/dialog"
 import { Input } from "@/components/ui/input"
 
-
 const MAX_QUICK_LAUNCH_LINKS = 8
 
 export type QuickLaunchDraftSlot = {
@@ -168,25 +167,25 @@ export function QuickLaunchEditModal({
           </div>
         ) : null}
         <DialogFooter className="mt-6">
-          <Button 
-            type="button" 
-            variant="outline" 
+          <Button
+            type="button"
+            variant="outline"
             onClick={() => {
               setErrorMessage(null)
               onClose()
-            }} 
+            }}
             disabled={isSaving}
           >
             Cancel
           </Button>
-          <Button 
-            type="button" 
+          <Button
+            type="button"
             onClick={() => {
               const urls = new Set<string>()
               for (const slot of draft) {
                 const t = slot.title.trim()
                 const u = slot.url.trim().toLowerCase()
-                
+
                 // Ignore completely empty slots (they are just deleted on save)
                 if (!t && (!u || u === "#")) continue
 
@@ -197,14 +196,16 @@ export function QuickLaunchEditModal({
                 }
 
                 if (urls.has(u)) {
-                  setErrorMessage("This link has already been added to your dashboard.")
+                  setErrorMessage(
+                    "This link has already been added to your dashboard."
+                  )
                   return
                 }
                 urls.add(u)
               }
               setErrorMessage(null)
               onSave()
-            }} 
+            }}
             disabled={isSaving}
           >
             {isSaving ? "Saving..." : "Save"}

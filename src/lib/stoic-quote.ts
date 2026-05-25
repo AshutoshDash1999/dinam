@@ -1,8 +1,6 @@
 import dayjs from "dayjs"
 import { useEffect, useState } from "react"
 
-import { MOCK_QUOTE } from "@/data/dashboard-mock"
-
 /** Same path as upstream; in dev Vite proxies to https://stoic.tekloon.net (see vite.config). */
 export const STOIC_QUOTE_API_URL = import.meta.env.DEV
   ? "/stoic-quote"
@@ -109,7 +107,10 @@ function initialDisplayQuote(): { text: string; author: string } {
   if (stored) {
     return { text: stored.quote, author: stored.author }
   }
-  return { text: MOCK_QUOTE.text, author: MOCK_QUOTE.author }
+  return {
+    text: "The details are not the details. They make the design.",
+    author: "Charles Eames",
+  }
 }
 
 export function useStoicQuote(): { text: string; author: string } {

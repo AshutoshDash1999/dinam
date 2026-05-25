@@ -1,0 +1,11 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(Get-ChildItem -Path \"e:\\\\Workspace\\\\dinam\" -Recurse -Depth 2)",
+      "Bash(Select-Object FullName)",
+      "Bash(Format-List)",
+      "Bash(npx tsc *)",
+      "Bash(Remove-Item \"e:\\\\Workspace\\\\dinam\\\\src\\\\data\\\\dashboard-mock.ts\")"
+    ]
+  }
+}

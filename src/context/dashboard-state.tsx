@@ -11,16 +11,23 @@ import {
 } from "react"
 
 import {
-  MOCK_BOOKMARKS,
-  MOCK_QUICK_LAUNCH,
-  type BookmarkItem,
-  type QuickLaunchItem,
-} from "@/data/dashboard-mock"
-
-import {
   fallbackNameFromQuickLaunchHref,
   normalizeQuickLaunchHref,
 } from "@/lib/quick-launch-utils"
+
+export type QuickLaunchItem = {
+  id: string
+  title: string
+  url: string
+  description?: string
+  favicon?: string
+}
+
+export type BookmarkItem = {
+  id: string
+  title: string
+  href: string
+}
 
 export type DashboardTodo = {
   id: string
@@ -31,6 +38,41 @@ export type DashboardTodo = {
   progress?: number
   finishedDate?: string
 }
+
+const DEFAULT_BOOKMARKS: BookmarkItem[] = [
+  { id: "b1", title: "Design reference", href: "https://www.are.na" },
+  { id: "b2", title: "Typography", href: "https://fonts.google.com" },
+  { id: "b3", title: "Color & contrast", href: "https://coolors.co" },
+  { id: "b4", title: "Documentation", href: "https://developer.mozilla.org" },
+]
+
+const DEFAULT_QUICK_LAUNCH: QuickLaunchItem[] = [
+  {
+    id: "q1",
+    title: "Mail",
+    url: "https://mail.google.com",
+    favicon: "https://www.google.com/s2/favicons?domain=mail.google.com&sz=64",
+  },
+  {
+    id: "q2",
+    title: "Documents",
+    url: "https://notion.so",
+    favicon: "https://www.google.com/s2/favicons?domain=notion.so&sz=64",
+  },
+  {
+    id: "q3",
+    title: "Calendar",
+    url: "https://calendar.google.com",
+    favicon:
+      "https://www.google.com/s2/favicons?domain=calendar.google.com&sz=64",
+  },
+  {
+    id: "q4",
+    title: "Terminal",
+    url: "https://github.com",
+    favicon: "https://www.google.com/s2/favicons?domain=github.com&sz=64",
+  },
+]
 
 const TODOS_KEY = "dinam-dashboard-todos"
 const BOOKMARKS_KEY = "dinam-dashboard-bookmarks"
@@ -73,9 +115,9 @@ function loadTodos(): DashboardTodo[] {
 function loadBookmarks(): BookmarkItem[] {
   try {
     const raw = localStorage.getItem(BOOKMARKS_KEY)
-    if (!raw) return [...MOCK_BOOKMARKS]
+    if (!raw) return [...DEFAULT_BOOKMARKS]
     const parsed: unknown = JSON.parse(raw)
-    if (!Array.isArray(parsed)) return [...MOCK_BOOKMARKS]
+    if (!Array.isArray(parsed)) return [...DEFAULT_BOOKMARKS]
 
     const next = parsed.filter(
       (x): x is BookmarkItem =>
@@ -85,18 +127,18 @@ function loadBookmarks(): BookmarkItem[] {
         typeof (x as BookmarkItem).title === "string" &&
         typeof (x as BookmarkItem).href === "string"
     )
-    return next.length > 0 ? next : [...MOCK_BOOKMARKS]
+    return next.length > 0 ? next : [...DEFAULT_BOOKMARKS]
   } catch {
-    return [...MOCK_BOOKMARKS]
+    return [...DEFAULT_BOOKMARKS]
   }
 }
 
 function loadQuickLaunch(): QuickLaunchItem[] {
   try {
     const raw = localStorage.getItem(QUICK_LAUNCH_KEY)
-    if (!raw) return [...MOCK_QUICK_LAUNCH]
+    if (!raw) return [...DEFAULT_QUICK_LAUNCH]
     const parsed: unknown = JSON.parse(raw)
-    if (!Array.isArray(parsed)) return [...MOCK_QUICK_LAUNCH]
+    if (!Array.isArray(parsed)) return [...DEFAULT_QUICK_LAUNCH]
 
     const next = parsed.filter(
       (x): x is QuickLaunchItem =>
@@ -106,9 +148,9 @@ function loadQuickLaunch(): QuickLaunchItem[] {
         typeof (x as QuickLaunchItem).title === "string" &&
         typeof (x as QuickLaunchItem).url === "string"
     )
-    return next.length > 0 ? next : [...MOCK_QUICK_LAUNCH]
+    return next.length > 0 ? next : [...DEFAULT_QUICK_LAUNCH]
   } catch {
-    return [...MOCK_QUICK_LAUNCH]
+    return [...DEFAULT_QUICK_LAUNCH]
   }
 }
 
@@ -129,10 +171,7 @@ export type DashboardStateContextValue = {
   addBookmark: (title: string, href: string) => string
   deleteBookmark: (id: string) => void
   setQuickLaunchItems: (items: QuickLaunchItem[]) => void
-  addQuickLaunchItem: (
-    title: string,
-    url: string
-  ) => string
+  addQuickLaunchItem: (title: string, url: string) => string
   removeQuickLaunchItem: (id: string) => void
   updateQuickLaunchItem: (
     id: string,
@@ -249,26 +288,20 @@ export function DashboardStateProvider({ children }: { children: ReactNode }) {
     setQuickLaunchState(items)
   }, [])
 
-  const addQuickLaunchItem = useCallback(
-    (title: string, url: string) => {
-      const urlNorm = normalizeQuickLaunchHref(url)
-      const titleTrim = title.trim()
-      const resolvedTitle = titleTrim || fallbackNameFromQuickLaunchHref(urlNorm)
-      if (!resolvedTitle && urlNorm === "#") return ""
-      const id = `q-${crypto.randomUUID()}`
+  const addQuickLaunchItem = useCallback((title: string, url: string) => {
+    const urlNorm = normalizeQuickLaunchHref(url)
+    const titleTrim = title.trim()
+    const resolvedTitle = titleTrim || fallbackNameFromQuickLaunchHref(urlNorm)
+    if (!resolvedTitle && urlNorm === "#") return ""
+    const id = `q-${crypto.randomUUID()}`
 
-      setQuickLaunchState((prev) => {
-        const next = [
-          ...prev,
-          { id, title: resolvedTitle, url: urlNorm },
-        ]
-        localStorage.setItem(QUICK_LAUNCH_KEY, JSON.stringify(next))
-        return next
-      })
-      return id
-    },
-    []
-  )
+    setQuickLaunchState((prev) => {
+      const next = [...prev, { id, title: resolvedTitle, url: urlNorm }]
+      localStorage.setItem(QUICK_LAUNCH_KEY, JSON.stringify(next))
+      return next
+    })
+    return id
+  }, [])
 
   const removeQuickLaunchItem = useCallback((id: string) => {
     setQuickLaunchState((prev) => {
@@ -279,16 +312,12 @@ export function DashboardStateProvider({ children }: { children: ReactNode }) {
   }, [])
 
   const updateQuickLaunchItem = useCallback(
-    (
-      id: string,
-      patch: Partial<Pick<QuickLaunchItem, "title" | "url">>
-    ) => {
+    (id: string, patch: Partial<Pick<QuickLaunchItem, "title" | "url">>) => {
       setQuickLaunchState((prev) => {
         const next = prev.map((q) => {
           if (q.id !== id) return q
           let url = q.url
-          if (patch.url !== undefined)
-            url = normalizeQuickLaunchHref(patch.url)
+          if (patch.url !== undefined) url = normalizeQuickLaunchHref(patch.url)
           let title = q.title
           if (patch.title !== undefined)
             title = patch.title.trim() || fallbackNameFromQuickLaunchHref(url)
