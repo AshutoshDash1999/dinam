@@ -1,6 +1,6 @@
 import dayjs from "dayjs"
 import relativeTime from "dayjs/plugin/relativeTime"
-import { useState, useEffect } from "react"
+import { useState, useEffect, useCallback } from "react"
 
 dayjs.extend(relativeTime)
 
@@ -26,6 +26,19 @@ type CacheData = {
 export function useTechNews() {
   const [news, setNews] = useState<NewsItem[]>([])
   const [status, setStatus] = useState<FetchStatus>("loading")
+  const [refreshTrigger, setRefreshTrigger] = useState(0)
+
+  const refetch = useCallback((force = false) => {
+    if (force) {
+      try {
+        localStorage.removeItem(CACHE_KEY)
+      } catch {
+        // Ignore cache errors and fetch fresh
+      }
+    }
+    setStatus("loading")
+    setRefreshTrigger((prev) => prev + 1)
+  }, [])
 
   useEffect(() => {
     let isMounted = true
@@ -108,7 +121,7 @@ export function useTechNews() {
     return () => {
       isMounted = false
     }
-  }, [])
+  }, [refreshTrigger])
 
-  return { news, status }
+  return { news, status, refetch }
 }

@@ -2,17 +2,41 @@ import { Globe, RefreshCw } from "lucide-react"
 
 import { dashboardSectionLabelClassName } from "@/components/dashboard/dashboard-section-label-classes"
 import { useTechNews } from "@/hooks/use-tech-news"
+import { cn } from "@/lib/utils"
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/components/ui/tooltip"
 
 export function TechNewsSection() {
-  const { news, status } = useTechNews()
+  const { news, status, refetch } = useTechNews()
 
   return (
     <article className="flex h-full flex-col rounded-[1.75rem] bg-card p-6 shadow-md ring-1 ring-border/40 lg:p-7">
       <div className="flex items-center justify-between">
         <h2 className={dashboardSectionLabelClassName}>Market intelligence</h2>
-        {status === "loading" && (
-          <RefreshCw className="size-3.5 animate-spin text-muted-foreground opacity-70" />
-        )}
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <button
+              type="button"
+              onClick={() => refetch(true)}
+              disabled={status === "loading"}
+              className="rounded-full p-1.5 text-muted-foreground hover:bg-muted hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/30 disabled:opacity-50"
+              aria-label="Refresh news"
+            >
+              <RefreshCw
+                className={cn(
+                  "size-3.5 opacity-70 transition-transform duration-500",
+                  status === "loading" && "animate-spin"
+                )}
+              />
+            </button>
+          </TooltipTrigger>
+          <TooltipContent side="left" sideOffset={4}>
+            Refresh news
+          </TooltipContent>
+        </Tooltip>
       </div>
 
       <div className="mt-6 flex-1">

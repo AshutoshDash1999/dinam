@@ -6,8 +6,6 @@ import {
   Search,
   Settings,
   Sun,
-  Cloud,
-  CloudRain,
 } from "lucide-react"
 import {
   type ChangeEvent,
@@ -35,7 +33,7 @@ import {
   openGoogleSearchByImage,
   resolveNavigationHref,
 } from "@/lib/search-engine"
-import { useWeather } from "@/hooks/use-weather"
+// import { useWeather } from "@/hooks/use-weather"
 
 const COLOR_SCHEME_QUERY = "(prefers-color-scheme: dark)"
 
@@ -67,12 +65,14 @@ function isEditableTarget(target: EventTarget | null): boolean {
   )
 }
 
+/*
 function timeOfDayGreeting(hour: number): string {
   if (hour >= 5 && hour < 12) return "Good morning"
   if (hour >= 12 && hour < 17) return "Good afternoon"
   if (hour >= 17 && hour < 22) return "Good evening"
   return "Good night"
 }
+*/
 
 function getSpeechRecognitionCtor(): (new () => SpeechRecognition) | undefined {
   if (typeof window === "undefined") {
@@ -85,6 +85,7 @@ type DashboardHeaderProps = {
   onOpenAssistant?: () => void
 }
 
+/*
 function getWeatherCondition(code: number) {
   if (code === 0) {
     return {
@@ -105,6 +106,7 @@ function getWeatherCondition(code: number) {
     icon: CloudRain,
   }
 }
+*/
 
 export function DashboardHeader({ onOpenAssistant }: DashboardHeaderProps) {
   const { theme, setTheme, searchUrlTemplate } = useTheme()
