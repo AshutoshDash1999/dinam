@@ -1,5 +1,5 @@
 import dayjs from "dayjs"
-import { useEffect, useState } from "react"
+import { useEffect, useState, useCallback } from "react"
 
 import { MOCK_QUOTE } from "@/data/dashboard-mock"
 
@@ -112,19 +112,38 @@ function initialDisplayQuote(): { text: string; author: string } {
   return { text: MOCK_QUOTE.text, author: MOCK_QUOTE.author }
 }
 
-export function useStoicQuote(): { text: string; author: string } {
+export function useStoicQuote(): {
+  text: string
+  author: string
+  refresh: () => void
+  loading: boolean
+} {
   const [quote, setQuote] = useState(initialDisplayQuote)
+  const [loading, setLoading] = useState(false)
+  const [refreshTrigger, setRefreshTrigger] = useState(0)
+
+  const refresh = useCallback(() => {
+    setLoading(true)
+    setRefreshTrigger((prev) => prev + 1)
+  }, [])
 
   useEffect(() => {
-    const stored = readStoicQuoteFromStorage()
-    const today = todayKey()
-    if (stored?.dayKey === today) {
-      return
+    const isManual = refreshTrigger > 0
+    if (!isManual) {
+      const stored = readStoicQuoteFromStorage()
+      const today = todayKey()
+      if (stored?.dayKey === today) {
+        return
+      }
     }
 
     let cancelled = false
     void fetchStoicQuoteFromApi().then((result) => {
-      if (cancelled || !result) return
+      if (cancelled) return
+      setLoading(false)
+      if (!result) return
+      
+      const today = todayKey()
       writeStoicQuoteToStorage({
         dayKey: today,
         quote: result.quote,
@@ -136,7 +155,7 @@ export function useStoicQuote(): { text: string; author: string } {
     return () => {
       cancelled = true
     }
-  }, [])
+  }, [refreshTrigger])
 
-  return quote
+  return { text: quote.text, author: quote.author, refresh, loading }
 }
