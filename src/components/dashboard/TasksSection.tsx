@@ -27,13 +27,14 @@ export function TasksSection() {
       <div className="mb-6 flex shrink-0 items-center justify-between gap-3">
         <h2 className={dashboardSectionLabelClassName}>Focus items</h2>
         {completedCount > 0 && (
-          <button
+          <Button
+            
             type="button"
             onClick={clearCompletedTodos}
             className="rounded-lg border border-border/60 bg-background px-2.5 py-1 text-xs font-medium text-muted-foreground shadow-sm transition-colors hover:text-destructive"
           >
             Clear completed ({completedCount})
-          </button>
+          </Button>
         )}
       </div>
 
@@ -60,6 +61,7 @@ export function TasksSection() {
       <div className="mt-4 shrink-0 border-t border-border/50 pt-4">
         <div className="flex items-center gap-2">
           <input
+            data-testid="task-input"
             type="text"
             value={newTaskLabel}
             onChange={(e) => setNewTaskLabel(e.target.value)}
@@ -71,6 +73,7 @@ export function TasksSection() {
             className="min-w-0 flex-1 rounded-xl border border-border/80 bg-card px-3 py-2 text-sm text-card-foreground outline-none"
           />
           <Button
+            data-testid="add-task-btn"
             type="button"
             variant="ghost"
             size="sm"
