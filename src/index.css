@@ -46,10 +46,11 @@
   --radius-2xl: calc(var(--radius) * 1.8);
   --radius-3xl: calc(var(--radius) * 2.2);
   --radius-4xl: calc(var(--radius) * 2.6);
+  --max-width-dashboard: 87.5rem; /* 1400px */
 }
 
 :root {
-  --radius: 0.625rem;
+  --radius: 0.825rem;
   --background: oklch(1 0 0);
   --foreground: oklch(0.145 0 0);
   --card: oklch(1 0 0);
@@ -84,23 +85,23 @@
 }
 
 .dark {
-  --background: oklch(0.145 0 0);
+  --background: oklch(0.18 0.01 260);
   --foreground: oklch(0.985 0 0);
-  --card: oklch(0.205 0 0);
+  --card: oklch(0.24 0.01 260);
   --card-foreground: oklch(0.985 0 0);
-  --popover: oklch(0.205 0 0);
+  --popover: oklch(0.24 0.01 260);
   --popover-foreground: oklch(0.985 0 0);
   --primary: oklch(0.922 0 0);
   --primary-foreground: oklch(0.205 0 0);
-  --secondary: oklch(0.269 0 0);
+  --secondary: oklch(0.3 0.01 260);
   --secondary-foreground: oklch(0.985 0 0);
-  --muted: oklch(0.269 0 0);
+  --muted: oklch(0.3 0.01 260);
   --muted-foreground: oklch(0.708 0 0);
-  --accent: oklch(0.269 0 0);
+  --accent: oklch(0.3 0.01 260);
   --accent-foreground: oklch(0.985 0 0);
-  --destructive: oklch(0.704 0.191 22.216);
-  --border: oklch(1 0 0 / 10%);
-  --input: oklch(1 0 0 / 15%);
+  --destructive: oklch(0.396 0.141 25.723);
+  --border: oklch(1 0 0 / 6%);
+  --input: oklch(1 0 0 / 8%);
   --ring: oklch(0.556 0 0);
   --chart-1: oklch(0.488 0.243 264.376);
   --chart-2: oklch(0.696 0.17 162.48);
@@ -196,4 +197,51 @@
 
 article{
   @apply shadow-xl hover:shadow-gray-500/40 shadow-gray-500/30 dark:shadow-gray-700/10 dark:hover:shadow-gray-700/20 duration-200; 
+}
+
+/* Glass card used throughout the dashboard (backdrop blur + subtle border) */
+.glass-card {
+  background: rgba(18,18,18,0.45);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border: 1px solid rgba(255,255,255,0.06);
+  @apply rounded-4xl;
+}
+
+/* Quick launch square tiles (Jump Back In) */
+.shortcut-btn {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  transition: transform .14s ease, filter .14s ease;
+}
+.shortcut-btn:hover { transform: translateY(-4px); }
+.shortcut-btn .icon-square { 
+  width: 56px; 
+  height: 56px; 
+  display:inline-flex; 
+  align-items:center; 
+  justify-content:center; 
+  border-radius:1rem; 
+  background: color-mix(in oklch, var(--foreground) 5%, transparent);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1); 
+  border:1px solid rgba(255,255,255,0.05);
+  overflow: hidden;
+  backdrop-filter: blur(8px);
+}
+.shortcut-btn:hover .icon-square {
+  background: color-mix(in oklch, var(--foreground) 10%, transparent);
+  border-color: rgba(255,255,255,0.1);
+}
+.shortcut-btn .icon-square img {
+  width: 28px;
+  height: 28px;
+  object-fit: contain;
+  filter: drop-shadow(0 2px 4px rgba(0,0,0,0.2));
+}
+.shortcut-btn span {
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: rgba(255,255,255,0.8);
 }

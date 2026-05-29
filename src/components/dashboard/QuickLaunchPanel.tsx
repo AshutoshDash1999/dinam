@@ -8,9 +8,8 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from "@/components/ui/tooltip"
-import { Globe } from "lucide-react"
+import { Globe, MoreHorizontal } from "lucide-react"
 import { fetchQuickLinkMetadata, normalizeUrl } from "@/lib/quick-link-metadata"
-import { cn } from "@/lib/utils"
 import {
   useDashboardState,
   type QuickLaunchItem,
@@ -113,95 +112,78 @@ export function QuickLaunchPanel() {
 
   return (
     <>
-      <article className="rounded-2xl bg-card p-6 shadow-md ring-1 ring-border/40 lg:p-7">
-        <div className="flex items-center justify-between gap-2">
-          <h2 className={dashboardSectionLabelClassName}>Jump back in</h2>
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <Button
-                type="button"
-                variant="ghost"
-                size="icon-xs"
-                onClick={openModal}
-                className="text-muted-foreground"
-                aria-label="Edit quick launch links"
-              >
-                <SquarePenIcon
-                  size={16}
-                  className="transition-colors group-hover:text-foreground"
-                />
-              </Button>
-            </TooltipTrigger>
-            <TooltipContent side="bottom" sideOffset={6}>
-              Edit quick links
-            </TooltipContent>
-          </Tooltip>
+      <article className="glass-card p-6">
+        <div className="flex items-center justify-between">
+          <h2 className={dashboardSectionLabelClassName}>Jump Back In</h2>
+          <div className="flex items-center gap-1">
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="icon-xs"
+                  onClick={openModal}
+                  className="text-muted-foreground/50 hover:text-foreground"
+                  aria-label="Edit quick launch links"
+                >
+                  <SquarePenIcon size={14} />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent side="bottom">Edit</TooltipContent>
+            </Tooltip>
+            <Button
+              type="button"
+              variant="ghost"
+              size="icon-xs"
+              className="text-muted-foreground/50 hover:text-foreground"
+            >
+              <MoreHorizontal size={14} />
+            </Button>
+          </div>
         </div>
+        
         {quickLaunchItems.length === 0 ? (
-          <p className="mt-6 text-sm text-muted-foreground">
+          <p className="mt-8 text-sm text-muted-foreground/60 text-center pb-4">
             No shortcuts yet.{" "}
             <button
               type="button"
-              className="font-medium text-primary underline-offset-2 hover:underline"
+              className="font-medium text-foreground underline-offset-4 hover:underline"
               onClick={openModal}
             >
               Add links
             </button>
           </p>
         ) : (
-          <div className="mt-6 grid grid-cols-4 gap-3 sm:gap-4">
-            {quickLaunchItems.map((item) => (
-              <Tooltip key={item.id}>
-                <TooltipTrigger asChild>
-                  <a
-                    href={item.url}
-                    {...(item.url.startsWith("http")
-                      ? {
-                          target: "_blank",
-                          rel: "noreferrer noopener",
-                        }
-                      : {})}
-                    className="group flex flex-col items-center outline-none focus-visible:ring-2 focus-visible:ring-ring/40"
-                    aria-label={item.title}
-                  >
-                    <span className="flex size-13 items-center justify-center rounded-full bg-card shadow-sm ring-1 ring-border/50 transition group-hover:shadow-md sm:size-14">
-                      {item.favicon ? (
-                        <img
-                          src={item.favicon}
-                          alt=""
-                          className="size-6 rounded-sm object-contain transition-opacity group-hover:opacity-90"
-                          onError={(e) => {
-                            e.currentTarget.style.display = "none"
-                            const fallback = e.currentTarget.nextElementSibling
-                            if (fallback instanceof HTMLElement) {
-                              fallback.style.display = "block"
-                            }
-                          }}
-                        />
-                      ) : null}
-                      <Globe
-                        className={cn(
-                          "size-6 text-muted-foreground transition-colors group-hover:text-foreground",
-                          item.favicon ? "hidden" : "block"
-                        )}
-                        strokeWidth={2}
-                        aria-hidden
-                      />
-                    </span>
-                  </a>
-                </TooltipTrigger>
-                <TooltipContent side="bottom" sideOffset={6}>
-                  <div className="flex flex-col gap-0.5">
-                    <span className="font-medium">{item.title}</span>
-                    {item.url !== "#" ? (
-                      <span className="max-w-56 truncate text-[0.65rem] opacity-80">
-                        {item.url}
-                      </span>
-                    ) : null}
+          <div className="mt-8 flex flex-col items-center">
+            <div className="flex flex-wrap justify-center gap-x-6 gap-y-8 w-full">
+              {quickLaunchItems.slice(0, 7).map((item) => (
+                <a
+                  key={item.id}
+                  href={item.url}
+                  target="_blank"
+                  rel="noreferrer noopener"
+                  className="shortcut-btn group"
+                >
+                  <div className="icon-square shadow-xl group-hover:shadow-white/10 transition-shadow">
+                    {item.favicon ? (
+                      <img src={item.favicon} alt="" />
+                    ) : (
+                      <Globe className="size-6 text-black/50" />
+                    )}
                   </div>
-                </TooltipContent>
-              </Tooltip>
-            ))}
+                  <span className="truncate max-w-[64px] group-hover:text-foreground transition-colors">
+                    {item.title}
+                  </span>
+                </a>
+              ))}
+            </div>
+            
+            {quickLaunchItems.length > 4 && (
+              <div className="mt-8 flex gap-1.5">
+                <div className="size-1.5 rounded-full bg-foreground" />
+                <div className="size-1.5 rounded-full bg-foreground/20" />
+              </div>
+            )}
           </div>
         )}
       </article>

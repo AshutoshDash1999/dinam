@@ -7,92 +7,82 @@ export function TechNewsSection() {
   const { news, status } = useTechNews()
 
   return (
-    <article className="flex h-full flex-col rounded-[1.75rem] bg-card p-6 shadow-md ring-1 ring-border/40 lg:p-7">
+    <article className="glass-card flex h-full flex-col p-6">
       <div className="flex items-center justify-between">
-        <h2 className={dashboardSectionLabelClassName}>Market intelligence</h2>
-        {status === "loading" && (
-          <RefreshCw className="size-3.5 animate-spin text-muted-foreground opacity-70" />
-        )}
+        <h2 className={dashboardSectionLabelClassName}>Market Intelligence</h2>
+        <div className="flex items-center gap-1">
+          {status === "loading" && (
+            <RefreshCw className="size-3 animate-spin text-muted-foreground/30 mr-1" />
+          )}
+        </div>
       </div>
 
       <div className="mt-6 flex-1">
         {status === "loading" && news.length === 0 ? (
           <ul className="flex flex-col gap-6">
-            {[1, 2, 3, 4].map((i) => (
+            {[1, 2, 3].map((i) => (
               <li
                 key={i}
-                className="flex items-center justify-between gap-4 py-1"
+                className="flex items-start justify-between gap-4"
               >
                 <div className="min-w-0 flex-1 space-y-3">
-                  <div className="h-2 w-16 animate-pulse rounded-full bg-muted-foreground/20" />
-                  <div className="space-y-1.5">
-                    <div className="h-3.5 w-full animate-pulse rounded-full bg-muted-foreground/20" />
-                    <div className="h-3.5 w-4/5 animate-pulse rounded-full bg-muted-foreground/20" />
+                  <div className="h-2 w-24 animate-pulse rounded-full bg-muted-foreground/10" />
+                  <div className="space-y-2">
+                    <div className="h-3.5 w-full animate-pulse rounded-full bg-muted-foreground/10" />
                   </div>
                 </div>
-                <div className="size-14 shrink-0 animate-pulse rounded-full bg-muted-foreground/10 ring-1 ring-border/40" />
+                <div className="size-14 shrink-0 animate-pulse rounded-xl bg-muted-foreground/5" />
               </li>
             ))}
           </ul>
         ) : status === "error" && news.length === 0 ? (
           <div className="flex h-full flex-col items-center justify-center text-center">
-            <p className="text-sm text-muted-foreground">
+            <p className="text-sm text-muted-foreground/50">
               Unable to load latest news.
             </p>
-            <button
-              onClick={() => window.location.reload()}
-              className="mt-2 text-xs text-primary hover:underline"
-            >
-              Try again
-            </button>
-          </div>
-        ) : news.length === 0 && status === "success" ? (
-          <div className="flex h-full items-center justify-center text-center text-sm text-muted-foreground">
-            No recent news available.
           </div>
         ) : (
           <ul className="flex flex-col gap-6">
-            {news.map((item) => (
+            {news.slice(0, 3).map((item) => (
               <li key={item.id}>
                 <a
                   href={item.url}
                   target="_blank"
                   rel="noreferrer noopener"
-                  className="group/news flex items-center justify-between gap-4 rounded-xl py-1 transition-colors outline-none focus-visible:ring-2 focus-visible:ring-ring/30"
+                  className="group/news flex items-start justify-between gap-4 py-0.5 focus-visible:ring-2 focus-visible:ring-white/10 focus-visible:ring-offset-2 focus-visible:ring-offset-background"
                 >
                   <div className="min-w-0 flex-1">
                     <div className="flex items-center gap-2">
-                      <p className="line-clamp-1 text-[0.6875rem] font-semibold tracking-[0.12em] text-primary uppercase">
+                      <span className="text-[0.6rem] font-bold tracking-widest text-muted-foreground/60 uppercase">
                         {item.source}
-                      </p>
-                      <span className="text-[0.65rem] text-muted-foreground">
-                        &bull; {item.timeAgo}
+                      </span>
+                      <span className="text-[0.6rem] text-muted-foreground/30">
+                        • {item.timeAgo}
                       </span>
                     </div>
-                    <p className="mt-1.5 text-sm leading-snug font-bold text-card-foreground group-hover/news:underline group-hover/news:decoration-primary/40 group-hover/news:underline-offset-2 sm:text-base">
+                    <p className="mt-1 text-xs leading-snug font-semibold text-foreground/90 group-hover/news:text-foreground transition-colors overflow-hidden [display:-webkit-box] [-webkit-line-clamp:2] [-webkit-box-orient:vertical]">
                       {item.headline}
                     </p>
                   </div>
                   <div
-                    className="flex size-14 shrink-0 items-center justify-center overflow-hidden rounded-full bg-muted/40 ring-1 ring-border/40"
+                    className="flex size-14 shrink-0 items-center justify-center overflow-hidden rounded-xl bg-white/5 border border-white/5 shadow-sm group-hover/news:border-white/10 transition-colors"
                     aria-hidden
                   >
-                    <img
-                      src={item.faviconUrl}
+                     <img
+                      src={item.faviconUrl || `https://www.google.com/s2/favicons?domain=${item.url}&sz=128`}
                       alt=""
-                      className="size-7 object-contain opacity-80 mix-blend-multiply transition-transform group-hover/news:scale-110 dark:mix-blend-normal"
+                      className="size-full object-cover opacity-80 group-hover/news:opacity-100 group-hover/news:scale-105 transition-all"
                       onError={(e) => {
                         e.currentTarget.style.display = "none"
                         const fallback = e.currentTarget.nextElementSibling
                         if (fallback instanceof HTMLElement) {
-                          fallback.style.display = "block"
+                          fallback.style.display = "flex"
                         }
                       }}
                     />
-                    <Globe
-                      className="hidden size-6 text-muted-foreground/50"
-                      strokeWidth={1.5}
-                    />
+                    <div className="hidden size-full items-center justify-center bg-muted/20">
+                      <Globe className="size-5 text-muted-foreground/20" strokeWidth={1} />
+                    </div>
                   </div>
                 </a>
               </li>

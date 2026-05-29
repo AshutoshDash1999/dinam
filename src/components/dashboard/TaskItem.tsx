@@ -1,51 +1,51 @@
-"use client"
-
-import { Check, Pencil, Trash2 } from "lucide-react"
-import { useState } from "react"
+import { useState, useCallback } from "react"
+import { Check, Pencil, Trash2, X } from "lucide-react"
 import { cn } from "@/lib/utils"
-import {
-  type DashboardTodo,
-  useDashboardState,
-} from "@/context/dashboard-state"
+import { type DashboardTodo } from "@/context/dashboard-state"
 
 interface TaskItemProps {
   todo: DashboardTodo
+  onToggle: () => void
+  onDelete: () => void
+  onUpdate: (label: string) => void
 }
 
-export function TaskItem({ todo }: TaskItemProps) {
-  const { toggleTodo, deleteTodo, updateTodo } = useDashboardState()
+export function TaskItem({ todo, onToggle, onDelete, onUpdate }: TaskItemProps) {
   const [isEditing, setIsEditing] = useState(false)
-  const [editLabel, setEditLabel] = useState("")
+  const [editLabel, setEditLabel] = useState(todo.label)
 
-  const startEdit = () => {
+  const handleStartEdit = useCallback(() => {
     setEditLabel(todo.label)
     setIsEditing(true)
-  }
+  }, [todo.label])
 
-  const commitEdit = () => {
-    const label = editLabel.trim()
-    if (label) updateTodo(todo.id, { label })
+  const handleCancelEdit = useCallback(() => {
     setIsEditing(false)
-  }
+    setEditLabel(todo.label)
+  }, [todo.label])
 
-  const cancelEdit = () => setIsEditing(false)
+  const handleCommitEdit = useCallback(() => {
+    const trimmed = editLabel.trim()
+    if (trimmed && trimmed !== todo.label) {
+      onUpdate(trimmed)
+    }
+    setIsEditing(false)
+  }, [editLabel, todo.label, onUpdate])
 
   return (
-    <li className="group/task flex flex-col gap-2 rounded-xl border border-border/30 bg-muted/20 p-3.5 transition-colors hover:bg-muted/40">
-      <div className="flex items-center gap-2">
+    <li className="group/task flex items-center justify-between gap-3 rounded-xl p-2 transition-colors hover:bg-white/5">
+      <div className="flex items-center gap-3 min-w-0 flex-1">
         <button
           type="button"
-          onClick={() => toggleTodo(todo.id)}
-          disabled={isEditing}
+          onClick={onToggle}
           className={cn(
-            "flex size-5 shrink-0 items-center justify-center rounded-full border-2 transition-colors",
+            "size-5 shrink-0 rounded-full border-2 transition-all",
             todo.done
-              ? "border-primary bg-primary text-primary-foreground"
-              : "border-primary/35 bg-transparent",
-            isEditing && "pointer-events-none opacity-40"
+              ? "bg-foreground border-foreground text-background"
+              : "border-muted-foreground/30 bg-transparent hover:border-muted-foreground/60"
           )}
         >
-          {todo.done ? <Check className="size-3" strokeWidth={3} /> : null}
+          {todo.done && <Check className="size-3 mx-auto" strokeWidth={4} />}
         </button>
 
         {isEditing ? (
@@ -54,65 +54,49 @@ export function TaskItem({ todo }: TaskItemProps) {
             value={editLabel}
             onChange={(e) => setEditLabel(e.target.value)}
             onKeyDown={(e) => {
-              if (e.key === "Enter") commitEdit()
-              if (e.key === "Escape") cancelEdit()
+              if (e.key === "Enter") handleCommitEdit()
+              if (e.key === "Escape") handleCancelEdit()
             }}
-            aria-label="Edit task title"
-            className="min-w-0 flex-1 rounded-lg border border-border bg-card px-3 py-1 text-sm font-medium text-card-foreground outline-none focus:border-primary"
+            onBlur={handleCommitEdit}
+            className="flex-1 bg-transparent border-none outline-none text-sm font-medium text-foreground p-0 focus:ring-0"
             autoFocus
           />
         ) : (
           <button
             type="button"
-            onClick={() => toggleTodo(todo.id)}
+            onClick={onToggle}
+            aria-pressed={todo.done}
             className={cn(
-              "min-w-0 flex-1 truncate text-left text-sm",
+              "text-sm font-medium transition-all cursor-pointer truncate text-left bg-transparent border-none p-0",
               todo.done
-                ? "text-muted-foreground line-through"
-                : "font-medium text-card-foreground"
+                ? "text-muted-foreground/40 line-through"
+                : "text-foreground/90"
             )}
           >
             {todo.label}
           </button>
         )}
+      </div>
 
-        <div className="flex shrink-0 items-center gap-1 opacity-0 transition-opacity group-hover/task:opacity-100">
-          {isEditing ? (
-            <>
-              <button
-                type="button"
-                className="flex items-center gap-1 rounded-lg bg-primary px-2.5 py-1 text-xs font-bold text-primary-foreground"
-                onClick={commitEdit}
-              >
-                <Check className="size-3" strokeWidth={3} /> Save
-              </button>
-              <button
-                type="button"
-                className="rounded-lg px-2.5 py-1 text-xs text-muted-foreground hover:bg-muted"
-                onClick={cancelEdit}
-              >
-                Cancel
-              </button>
-            </>
-          ) : (
-            <>
-              <button
-                type="button"
-                className="flex items-center gap-1 rounded-lg px-2 py-1 text-xs text-muted-foreground hover:bg-muted"
-                onClick={startEdit}
-              >
-                <Pencil className="size-3" />
-              </button>
-              <button
-                type="button"
-                className="flex items-center gap-1 rounded-lg px-2 py-1 text-xs text-muted-foreground hover:bg-destructive/10 hover:text-destructive"
-                onClick={() => deleteTodo(todo.id)}
-              >
-                <Trash2 className="size-3" />
-              </button>
-            </>
-          )}
-        </div>
+      <div className="flex items-center gap-1 opacity-0 transition-opacity group-hover/task:opacity-100 group-focus-within/task:opacity-100">
+        <button
+          type="button"
+          onClick={isEditing ? handleCancelEdit : handleStartEdit}
+          aria-label={isEditing ? "Cancel edit" : "Edit task"}
+          aria-expanded={isEditing}
+          className="p-1 text-muted-foreground/40 hover:text-foreground transition-colors focus:outline-none focus-visible:shadow-focus"
+        >
+          {isEditing ? <X className="size-3.5" /> : <Pencil className="size-3.5" />}
+        </button>
+
+        <button
+          type="button"
+          onClick={onDelete}
+          aria-label="Delete task"
+          className="p-1 text-muted-foreground/40 hover:text-destructive transition-colors focus:outline-none focus-visible:shadow-focus"
+        >
+          <Trash2 className="size-3.5" />
+        </button>
       </div>
     </li>
   )

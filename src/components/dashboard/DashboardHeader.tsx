@@ -18,6 +18,7 @@ import {
   useSyncExternalStore,
 } from "react"
 
+import { cn } from "@/lib/utils"
 import { DashboardSettingsModal } from "@/components/dashboard/DashboardSettingsModal"
 import { LiveClock } from "@/components/dashboard/LiveClock"
 import { LiveGreeting } from "@/components/dashboard/LiveGreeting"
@@ -33,6 +34,7 @@ import {
   openGoogleSearchByImage,
   resolveNavigationHref,
 } from "@/lib/search-engine"
+
 
 const COLOR_SCHEME_QUERY = "(prefers-color-scheme: dark)"
 
@@ -79,7 +81,6 @@ export function DashboardHeader({ onOpenAssistant }: DashboardHeaderProps) {
   const { theme, setTheme, searchUrlTemplate } = useTheme()
   const [settingsOpen, setSettingsOpen] = useState(false)
   const [searchQuery, setSearchQuery] = useState("")
-  const [searchFocused, setSearchFocused] = useState(false)
   const [voiceListening, setVoiceListening] = useState(false)
   const imageSearchInputRef = useRef<HTMLInputElement>(null)
   const searchInputRef = useRef<HTMLInputElement>(null)
@@ -228,77 +229,79 @@ export function DashboardHeader({ onOpenAssistant }: DashboardHeaderProps) {
     () => getSpeechRecognitionCtor() !== undefined,
     []
   )
-
   return (
-    <header className="w-full">
-      <div className="flex items-start justify-between gap-4 px-1">
+    <header className="relative w-full">
+      <div className="flex items-start justify-between">
         <LiveClock />
-
-        <div className="flex shrink-0 items-center gap-0.5">
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <Button
-                data-testid="theme-toggle"
-                type="button"
-                variant="ghost"
-                size="icon"
-                className="rounded-full text-muted-foreground"
-                aria-label={
-                  resolvedTheme === "dark"
-                    ? "Switch to light mode"
-                    : "Switch to dark mode"
-                }
-                onClick={() =>
-                  setTheme(resolvedTheme === "dark" ? "light" : "dark")
-                }
-              >
-                {resolvedTheme === "dark" ? (
-                  <Sun className="size-5" strokeWidth={2} aria-hidden />
-                ) : (
-                  <Moon className="size-5" strokeWidth={2} aria-hidden />
-                )}
-              </Button>
-            </TooltipTrigger>
-            <TooltipContent side="bottom" sideOffset={6}>
-              {resolvedTheme === "dark" ? "Light mode" : "Dark mode"}
-            </TooltipContent>
-          </Tooltip>
-          {onOpenAssistant ? (
+        
+        <div className="flex-1" /> {/* Spacer */}
+        
+        <div className="flex items-center gap-6">
+          <div className="flex shrink-0 items-center gap-1 opacity-40 hover:opacity-100 transition-opacity">
             <Tooltip>
               <TooltipTrigger asChild>
                 <Button
                   type="button"
                   variant="ghost"
                   size="icon"
-                  className="rounded-full text-muted-foreground"
-                  aria-label="Open assistant"
-                  onClick={onOpenAssistant}
+                  className="rounded-full text-foreground/80 hover:bg-white/5"
+                  aria-label={
+                    resolvedTheme === "dark"
+                      ? "Switch to light mode"
+                      : "Switch to dark mode"
+                  }
+                  onClick={() =>
+                    setTheme(resolvedTheme === "dark" ? "light" : "dark")
+                  }
                 >
-                  <MessageSquare className="size-5" strokeWidth={2} />
+                  {resolvedTheme === "dark" ? (
+                    <Sun className="size-5" strokeWidth={1.5} aria-hidden />
+                  ) : (
+                    <Moon className="size-5" strokeWidth={1.5} aria-hidden />
+                  )}
                 </Button>
               </TooltipTrigger>
               <TooltipContent side="bottom" sideOffset={6}>
-                Chat assistant
+                {resolvedTheme === "dark" ? "Light mode" : "Dark mode"}
               </TooltipContent>
             </Tooltip>
-          ) : null}
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <Button
-                type="button"
-                variant="ghost"
-                size="icon"
-                className="rounded-full text-muted-foreground"
-                aria-label="Open settings"
-                onClick={() => setSettingsOpen(true)}
-              >
-                <Settings className="size-5" strokeWidth={2} />
-              </Button>
-            </TooltipTrigger>
-            <TooltipContent side="bottom" sideOffset={6}>
-              Settings
-            </TooltipContent>
-          </Tooltip>
+            {onOpenAssistant ? (
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="icon"
+                    className="rounded-full text-foreground/80 hover:bg-white/5"
+                    aria-label="Open assistant"
+                    onClick={onOpenAssistant}
+                  >
+                    <MessageSquare className="size-5" strokeWidth={1.5} />
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent side="bottom" sideOffset={6}>
+                  Chat assistant
+                </TooltipContent>
+              </Tooltip>
+            ) : null}
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="icon"
+                  className="rounded-full text-foreground/80 hover:bg-white/5"
+                  aria-label="Open settings"
+                  onClick={() => setSettingsOpen(true)}
+                >
+                  <Settings className="size-5" strokeWidth={1.5} />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent side="bottom" sideOffset={6}>
+                Settings
+              </TooltipContent>
+            </Tooltip>
+          </div>
         </div>
       </div>
 
@@ -307,11 +310,13 @@ export function DashboardHeader({ onOpenAssistant }: DashboardHeaderProps) {
         onOpenChange={setSettingsOpen}
       />
 
-      <div className="mt-10 flex flex-col items-center text-center sm:mt-14">
-        <LiveGreeting />
+      <div className="mt-4 flex flex-col items-center text-center">
+        <div className="mb-6">
+          <LiveGreeting />
+        </div>
 
         <form
-          className="relative mt-6 w-full max-w-xl sm:mt-8"
+          className="relative w-full max-w-xl"
           onSubmit={handleSearchSubmit}
         >
           <label htmlFor="dashboard-search" className="sr-only">
@@ -327,8 +332,8 @@ export function DashboardHeader({ onOpenAssistant }: DashboardHeaderProps) {
             onChange={handleImageSearchFile}
           />
           <Search
-            className="pointer-events-none absolute top-1/2 left-5 z-1 size-5 -translate-y-1/2 text-muted-foreground"
-            strokeWidth={2}
+            className="absolute top-1/2 left-5 z-10 size-4 -translate-y-1/2 text-muted-foreground/60"
+            strokeWidth={2.5}
             aria-hidden
           />
           <Input
@@ -338,8 +343,6 @@ export function DashboardHeader({ onOpenAssistant }: DashboardHeaderProps) {
             ref={searchInputRef}
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            onFocus={() => setSearchFocused(true)}
-            onBlur={() => setSearchFocused(false)}
             onKeyDown={(event) => {
               if (event.key === "Escape") {
                 event.currentTarget.blur()
@@ -347,63 +350,53 @@ export function DashboardHeader({ onOpenAssistant }: DashboardHeaderProps) {
             }}
             placeholder="Search the web or type a URL"
             autoComplete="off"
-            className="h-auto rounded-full border-border/80 bg-card py-3.5 pr-36 pl-14 text-center shadow-sm placeholder:text-muted-foreground focus-visible:ring-ring/25 sm:text-left"
+            className="h-11 rounded-full border-white/5 bg-white/5 px-12 text-sm transition-all focus:border-white/10 focus:bg-white/10 focus:ring-0 placeholder:text-muted-foreground/40"
           />
-          <div className="absolute top-1/2 right-4 z-10 flex -translate-y-1/2 items-center gap-1.5">
-            {!searchFocused ? (
-              <kbd
-                aria-hidden
-                className="pointer-events-none inline-flex h-6 min-w-6 items-center justify-center rounded-md border border-border/70 px-1.5 text-xs font-medium text-muted-foreground"
-              >
-                /
-              </kbd>
-            ) : null}
+          <div className="absolute top-1/2 right-5 z-10 flex -translate-y-1/2 items-center gap-2">
             <Tooltip>
               <TooltipTrigger asChild>
                 <Button
                   type="button"
                   variant="ghost"
-                  size="icon-xs"
-                  className="size-8 shrink-0 rounded-full text-muted-foreground hover:text-foreground"
+                  size="icon"
+                  className="size-7 shrink-0 rounded-full text-muted-foreground/60 hover:text-foreground"
                   aria-label="Search by image on Google"
                   onClick={handleImageSearchPick}
                 >
-                  <ScanSearch className="size-5" strokeWidth={2} aria-hidden />
+                  <ScanSearch className="size-4" strokeWidth={2.5} aria-hidden />
                 </Button>
               </TooltipTrigger>
               <TooltipContent side="bottom" sideOffset={6}>
                 Search by image (Google)
               </TooltipContent>
             </Tooltip>
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Button
-                  type="button"
-                  variant="ghost"
-                  size="icon-xs"
-                  className={
-                    voiceListening
-                      ? "size-8 shrink-0 rounded-full text-destructive hover:text-destructive"
-                      : "size-8 shrink-0 rounded-full text-muted-foreground hover:text-foreground"
-                  }
-                  aria-label={
-                    voiceListening ? "Stop voice search" : "Voice search"
-                  }
-                  aria-pressed={voiceListening}
-                  disabled={!speechSupported}
-                  onClick={toggleVoiceSearch}
-                >
-                  <Mic className="size-5" strokeWidth={2} aria-hidden />
-                </Button>
-              </TooltipTrigger>
-              <TooltipContent side="bottom" sideOffset={6}>
-                {!speechSupported
-                  ? "Voice search needs a supported browser (e.g. Chrome)"
-                  : voiceListening
-                    ? "Stop without searching"
-                    : "Voice search (then opens results)"}
-              </TooltipContent>
-            </Tooltip>
+            {speechSupported && (
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="icon"
+                    className={cn(
+                      "size-7 shrink-0 rounded-full",
+                      voiceListening
+                        ? "text-destructive hover:text-destructive animate-pulse"
+                        : "text-muted-foreground/60 hover:text-foreground"
+                    )}
+                    aria-label={
+                      voiceListening ? "Stop voice search" : "Voice search"
+                    }
+                    aria-pressed={voiceListening}
+                    onClick={toggleVoiceSearch}
+                  >
+                    <Mic className="size-4" strokeWidth={2.5} aria-hidden />
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent side="bottom" sideOffset={6}>
+                  {voiceListening ? "Stop voice search" : "Voice search"}
+                </TooltipContent>
+              </Tooltip>
+            )}
           </div>
         </form>
       </div>

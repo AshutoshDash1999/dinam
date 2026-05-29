@@ -25,13 +25,10 @@ export function LiveGreeting() {
   const greeting = useMemo(() => getCreativeGreeting(), [currentHour])
 
   return (
-    <div className="flex min-h-[7rem] w-full max-w-4xl items-center justify-center">
-      <p className="inline-flex flex-wrap items-center justify-center gap-x-4 gap-y-1 text-center text-5xl leading-none font-bold tracking-tight text-foreground select-none sm:text-6xl md:text-7xl lg:text-8xl">
-        <span className="inline-block max-w-3xl leading-tight text-balance">
+    <div className="flex items-center justify-center">
+      <p className="text-center text-5xl md:text-6xl lg:text-7xl font-bold tracking-tighter text-white select-none leading-[0.9]">
+        <span className="inline-block max-w-xl leading-[1] text-balance">
           {greeting.text}
-        </span>
-        <span className="manual-emoji-reset inline-block shrink-0 animate-pulse align-middle text-5xl leading-none sm:text-6xl md:text-7xl lg:text-8xl">
-          {greeting.emoji}
         </span>
       </p>
     </div>
