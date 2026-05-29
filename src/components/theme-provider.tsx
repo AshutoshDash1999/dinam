@@ -18,8 +18,6 @@ import {
   clearWallpaper as idbClearWallpaper,
 } from "@/lib/wallpaper-storage"
 
-const WALLPAPER_FLAG_KEY = "dinam-has-wallpaper"
-
 type Theme = "dark" | "light" | "system"
 type ResolvedTheme = "dark" | "light"
 
@@ -30,7 +28,7 @@ type ThemeProviderProps = {
   /** localStorage key for accent / color preset (default: `theme-accent`). */
   accentStorageKey?: string
   defaultAccent?: AccentId
-  /** Base64 data URL or remote URL for dashboard background; persisted in localStorage. */
+  /** Legacy localStorage key for wallpaper migration; wallpaper is now stored in IndexedDB. */
   dashboardWallpaperStorageKey?: string
   /** localStorage key for search URL template with `%s` (default: `dashboard-search-url`). */
   searchUrlTemplateStorageKey?: string
@@ -154,9 +152,7 @@ export function ThemeProvider({
     string | null
   >(null)
 
-  const [wallpaperLoading, setWallpaperLoading] = React.useState(
-    () => localStorage.getItem(WALLPAPER_FLAG_KEY) === "true"
-  )
+  const [wallpaperLoading, setWallpaperLoading] = React.useState(true)
 
   const [searchUrlTemplate, setSearchUrlTemplateState] = React.useState(() => {
     return getInitialSearchUrlTemplate(
@@ -175,24 +171,16 @@ export function ThemeProvider({
     [searchUrlTemplateStorageKey]
   )
 
-  const setDashboardWallpaper = React.useCallback(
-    (value: string | null) => {
-      if (value === null || value === "") {
-        localStorage.removeItem(WALLPAPER_FLAG_KEY)
-        setDashboardWallpaperState(null)
-        void idbClearWallpaper().catch(() => {})
-        return
-      }
+  function setDashboardWallpaper(value: string | null) {
+    if (value === null || value === "") {
+      setDashboardWallpaperState(null)
+      idbClearWallpaper()
+      return
+    }
 
-      setDashboardWallpaperState(value)
-      void idbSaveWallpaper(value)
-        .then(() => {
-          localStorage.setItem(WALLPAPER_FLAG_KEY, "true")
-        })
-        .catch(() => {})
-    },
-    []
-  )
+    setDashboardWallpaperState(value)
+    idbSaveWallpaper(value)
+  }
 
   const setTheme = React.useCallback(
     (nextTheme: Theme) => {
@@ -287,13 +275,8 @@ export function ThemeProvider({
     async function initWallpaper() {
       const oldDataUrl = localStorage.getItem(dashboardWallpaperStorageKey)
       if (oldDataUrl && oldDataUrl.startsWith("data:")) {
-        try {
-          await idbSaveWallpaper(oldDataUrl)
-          localStorage.setItem(WALLPAPER_FLAG_KEY, "true")
-          localStorage.removeItem(dashboardWallpaperStorageKey)
-        } catch {
-          /* migration failed — keep localStorage copy */
-        }
+        await idbSaveWallpaper(oldDataUrl)
+        localStorage.removeItem(dashboardWallpaperStorageKey)
         if (!cancelled) {
           setDashboardWallpaperState(oldDataUrl)
           setWallpaperLoading(false)
@@ -301,15 +284,13 @@ export function ThemeProvider({
         return
       }
 
-      if (localStorage.getItem(WALLPAPER_FLAG_KEY) === "true") {
-        try {
-          const stored = await idbLoadWallpaper()
-          if (!cancelled) {
-            setDashboardWallpaperState(stored)
-          }
-        } catch {
-          /* IndexedDB unavailable */
+      try {
+        const stored = await idbLoadWallpaper()
+        if (!cancelled && stored) {
+          setDashboardWallpaperState(stored)
         }
+      } catch {
+        /* IndexedDB unavailable */
       }
 
       if (!cancelled) {
@@ -317,7 +298,7 @@ export function ThemeProvider({
       }
     }
 
-    void initWallpaper()
+    initWallpaper()
     return () => {
       cancelled = true
     }
@@ -343,17 +324,6 @@ export function ThemeProvider({
           setAccentState(event.newValue)
         } else {
           setAccentState(defaultAccent)
-        }
-        return
-      }
-
-      if (event.key === WALLPAPER_FLAG_KEY) {
-        if (event.newValue === "true") {
-          void idbLoadWallpaper()
-            .then((v) => setDashboardWallpaperState(v))
-            .catch(() => {})
-        } else {
-          setDashboardWallpaperState(null)
         }
         return
       }
@@ -399,7 +369,6 @@ export function ThemeProvider({
       wallpaperLoading,
       searchUrlTemplate,
       setAccent,
-      setDashboardWallpaper,
       setSearchUrlTemplate,
       setTheme,
       theme,

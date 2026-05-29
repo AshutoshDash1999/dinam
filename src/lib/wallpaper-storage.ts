@@ -20,13 +20,17 @@ function openDB(): Promise<IDBDatabase> {
 
 /** Save a wallpaper data URL to IndexedDB. */
 export async function saveWallpaper(dataUrl: string): Promise<void> {
-  const db = await openDB()
-  return new Promise((resolve, reject) => {
-    const tx = db.transaction(STORE_NAME, "readwrite")
-    tx.objectStore(STORE_NAME).put(dataUrl, KEY)
-    tx.oncomplete = () => resolve()
-    tx.onerror = () => reject(tx.error)
-  })
+  try {
+    const db = await openDB()
+    return await new Promise((resolve, reject) => {
+      const tx = db.transaction(STORE_NAME, "readwrite")
+      tx.objectStore(STORE_NAME).put(dataUrl, KEY)
+      tx.oncomplete = () => resolve()
+      tx.onerror = () => reject(tx.error)
+    })
+  } catch {
+    console.warn("[dinam] Failed to save wallpaper to IndexedDB.")
+  }
 }
 
 /** Load the current wallpaper data URL from IndexedDB. */
@@ -43,13 +47,17 @@ export async function loadWallpaper(): Promise<string | null> {
 
 /** Remove the wallpaper from IndexedDB. */
 export async function clearWallpaper(): Promise<void> {
-  const db = await openDB()
-  return new Promise((resolve, reject) => {
-    const tx = db.transaction(STORE_NAME, "readwrite")
-    tx.objectStore(STORE_NAME).delete(KEY)
-    tx.oncomplete = () => resolve()
-    tx.onerror = () => reject(tx.error)
-  })
+  try {
+    const db = await openDB()
+    return await new Promise((resolve, reject) => {
+      const tx = db.transaction(STORE_NAME, "readwrite")
+      tx.objectStore(STORE_NAME).delete(KEY)
+      tx.oncomplete = () => resolve()
+      tx.onerror = () => reject(tx.error)
+    })
+  } catch {
+    console.warn("[dinam] Failed to clear wallpaper from IndexedDB.")
+  }
 }
 
 /**
