@@ -78,6 +78,18 @@ const TODOS_KEY = "dinam-dashboard-todos"
 const BOOKMARKS_KEY = "dinam-dashboard-bookmarks"
 const QUICK_LAUNCH_KEY = "dinam-dashboard-quick-launch"
 
+function safeSetItem(key: string, value: string): void {
+  try {
+    localStorage.setItem(key, value)
+  } catch (e) {
+    if (e instanceof DOMException && e.name === "QuotaExceededError") {
+      console.warn(
+        `[dinam] Storage full — could not save "${key}". Some changes may not persist.`
+      )
+    }
+  }
+}
+
 function newTodoId() {
   return `t-${crypto.randomUUID()}`
 }
@@ -190,7 +202,7 @@ export function DashboardStateProvider({ children }: { children: ReactNode }) {
     useState<QuickLaunchItem[]>(loadQuickLaunch)
 
   useEffect(() => {
-    localStorage.setItem(TODOS_KEY, JSON.stringify(todos))
+    safeSetItem(TODOS_KEY, JSON.stringify(todos))
   }, [todos])
 
   const addTodo = useCallback(
@@ -269,7 +281,7 @@ export function DashboardStateProvider({ children }: { children: ReactNode }) {
     const id = newBookmarkId()
     setBookmarksState((prev) => {
       const next = [...prev, { id, title: t, href: h }]
-      localStorage.setItem(BOOKMARKS_KEY, JSON.stringify(next))
+      safeSetItem(BOOKMARKS_KEY, JSON.stringify(next))
       return next
     })
     return id
@@ -278,13 +290,13 @@ export function DashboardStateProvider({ children }: { children: ReactNode }) {
   const deleteBookmark = useCallback((id: string) => {
     setBookmarksState((prev) => {
       const next = prev.filter((b) => b.id !== id)
-      localStorage.setItem(BOOKMARKS_KEY, JSON.stringify(next))
+      safeSetItem(BOOKMARKS_KEY, JSON.stringify(next))
       return next
     })
   }, [])
 
   const setQuickLaunchItems = useCallback((items: QuickLaunchItem[]) => {
-    localStorage.setItem(QUICK_LAUNCH_KEY, JSON.stringify(items))
+    safeSetItem(QUICK_LAUNCH_KEY, JSON.stringify(items))
     setQuickLaunchState(items)
   }, [])
 
@@ -297,7 +309,7 @@ export function DashboardStateProvider({ children }: { children: ReactNode }) {
 
     setQuickLaunchState((prev) => {
       const next = [...prev, { id, title: resolvedTitle, url: urlNorm }]
-      localStorage.setItem(QUICK_LAUNCH_KEY, JSON.stringify(next))
+      safeSetItem(QUICK_LAUNCH_KEY, JSON.stringify(next))
       return next
     })
     return id
@@ -306,7 +318,7 @@ export function DashboardStateProvider({ children }: { children: ReactNode }) {
   const removeQuickLaunchItem = useCallback((id: string) => {
     setQuickLaunchState((prev) => {
       const next = prev.filter((q) => q.id !== id)
-      localStorage.setItem(QUICK_LAUNCH_KEY, JSON.stringify(next))
+      safeSetItem(QUICK_LAUNCH_KEY, JSON.stringify(next))
       return next
     })
   }, [])
@@ -327,7 +339,7 @@ export function DashboardStateProvider({ children }: { children: ReactNode }) {
             url,
           }
         })
-        localStorage.setItem(QUICK_LAUNCH_KEY, JSON.stringify(next))
+        safeSetItem(QUICK_LAUNCH_KEY, JSON.stringify(next))
         return next
       })
     },
