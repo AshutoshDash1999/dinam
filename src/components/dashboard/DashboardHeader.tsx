@@ -241,6 +241,7 @@ export function DashboardHeader({ onOpenAssistant }: DashboardHeaderProps) {
             <Tooltip>
               <TooltipTrigger asChild>
                 <Button
+                  data-testid="theme-toggle"
                   type="button"
                   variant="ghost"
                   size="icon"

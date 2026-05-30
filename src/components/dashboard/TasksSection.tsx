@@ -64,6 +64,7 @@ export function TasksSection() {
 
       <div className="mt-4 shrink-0 space-y-3 border-t border-border/50 pt-4">
         <input
+          data-testid="task-input"
           ref={taskInputRef}
           type="text"
           value={newTaskLabel}
