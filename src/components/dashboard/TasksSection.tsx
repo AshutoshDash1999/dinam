@@ -64,6 +64,7 @@ export function TasksSection() {
 
       <div className="mt-4 shrink-0 space-y-3 border-t border-border/50 pt-4">
         <input
+          data-testid="task-input"
           ref={taskInputRef}
           type="text"
           value={newTaskLabel}
@@ -77,6 +78,7 @@ export function TasksSection() {
 
         <div className="flex flex-wrap items-center gap-3 rounded-xl border border-border/30 bg-muted/40 p-2.5">
           <Button
+            data-testid="add-task-btn"
             type="button"
             variant="ghost"
             size="sm"

@@ -112,6 +112,56 @@ After making changes, rebuild the project and reload the unpacked extension to v
 | `npm run format`    | Prettier (TS/TSX)            |
 | `npm run typecheck` | TypeScript `--noEmit`        |
 
+
+## End-to-End Testing
+
+This project uses Playwright for automated end-to-end (E2E) testing across multiple browsers.
+
+### Run E2E Tests
+
+```bash
+npm run test:e2e
+```
+
+### Run Tests in Headed Mode
+
+```bash
+npm run test:e2e:headed
+```
+
+### Debug Tests
+
+```bash
+npm run test:e2e:debug
+```
+
+### Open Playwright HTML Report
+
+```bash
+npx playwright show-report
+```
+
+### Browser Coverage
+
+The E2E suite currently runs against:
+
+- Chromium
+- Firefox
+- WebKit
+- Mobile Chrome (Pixel 5)
+
+### CI Integration
+
+Playwright tests run automatically through GitHub Actions on:
+- Pull requests
+- Pushes to `master`
+
+### Current Test Coverage
+
+- Dashboard rendering
+- Task creation flow
+- Theme persistence across reloads
+
 ### Adding UI components
 
 This project uses the shadcn CLI. Example:
