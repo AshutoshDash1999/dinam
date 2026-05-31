@@ -37,9 +37,9 @@ import {
 } from "@/lib/search-engine"
 import { ACCENT_OPTIONS, type AccentId } from "@/lib/theme-accent-presets"
 import { cn } from "@/lib/utils"
+import { compressImageFile } from "@/lib/wallpaper-storage"
 
-/** ~3 MiB — keeps data URLs within typical localStorage limits. */
-const MAX_WALLPAPER_BYTES = 3 * 1024 * 1024
+const MAX_WALLPAPER_BYTES = 10 * 1024 * 1024
 
 type SettingsSectionId = "appearance" | "search" | "assistant"
 
@@ -106,6 +106,8 @@ export function DashboardSettingsModal({
     fileInputRef.current?.click()
   }
 
+  const [wallpaperSaving, setWallpaperSaving] = useState(false)
+
   const handleWallpaperFile = (event: ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0]
     event.target.value = ""
@@ -126,18 +128,19 @@ export function DashboardSettingsModal({
       return
     }
 
-    const reader = new FileReader()
-    reader.onload = () => {
-      const result = reader.result
-      if (typeof result === "string") {
-        setWallpaperError(null)
-        setDashboardWallpaper(result)
-      }
-    }
-    reader.onerror = () => {
-      setWallpaperError("Could not read that file.")
-    }
-    reader.readAsDataURL(file)
+    setWallpaperSaving(true)
+    setWallpaperError(null)
+
+    compressImageFile(file)
+      .then((dataUrl) => {
+        setDashboardWallpaper(dataUrl)
+      })
+      .catch(() => {
+        setWallpaperError("Could not process that image.")
+      })
+      .finally(() => {
+        setWallpaperSaving(false)
+      })
   }
 
   return (
@@ -239,9 +242,14 @@ export function DashboardSettingsModal({
                       size="sm"
                       className="rounded-2xl border-border/80"
                       onClick={handleWallpaperPick}
+                      disabled={wallpaperSaving}
                     >
                       <ImageIcon className="size-4 opacity-80" aria-hidden />
-                      {dashboardWallpaper ? "Replace image" : "Upload image"}
+                      {wallpaperSaving
+                        ? "Compressing…"
+                        : dashboardWallpaper
+                          ? "Replace image"
+                          : "Upload image"}
                     </Button>
                     {dashboardWallpaper ? (
                       <Button

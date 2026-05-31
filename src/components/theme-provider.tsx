@@ -12,6 +12,11 @@ import {
   mergeAccentVariables,
   type AccentId,
 } from "@/lib/theme-accent-presets"
+import {
+  saveWallpaper as idbSaveWallpaper,
+  loadWallpaper as idbLoadWallpaper,
+  clearWallpaper as idbClearWallpaper,
+} from "@/lib/wallpaper-storage"
 
 type Theme = "dark" | "light" | "system"
 type ResolvedTheme = "dark" | "light"
@@ -23,7 +28,7 @@ type ThemeProviderProps = {
   /** localStorage key for accent / color preset (default: `theme-accent`). */
   accentStorageKey?: string
   defaultAccent?: AccentId
-  /** Base64 data URL or remote URL for dashboard background; persisted in localStorage. */
+  /** Legacy localStorage key for wallpaper migration; wallpaper is now stored in IndexedDB. */
   dashboardWallpaperStorageKey?: string
   /** localStorage key for search URL template with `%s` (default: `dashboard-search-url`). */
   searchUrlTemplateStorageKey?: string
@@ -40,6 +45,8 @@ type ThemeProviderState = {
   setAccent: (accent: AccentId) => void
   /** Data URL or absolute URL; `null` clears the wallpaper. */
   dashboardWallpaper: string | null
+  /** True while the wallpaper is being loaded from IndexedDB on mount. */
+  wallpaperLoading: boolean
   setDashboardWallpaper: (value: string | null) => void
   /** Full URL template; use `%s` where the encoded query belongs. */
   searchUrlTemplate: string
@@ -143,7 +150,9 @@ export function ThemeProvider({
 
   const [dashboardWallpaper, setDashboardWallpaperState] = React.useState<
     string | null
-  >(() => localStorage.getItem(dashboardWallpaperStorageKey))
+  >(null)
+
+  const [wallpaperLoading, setWallpaperLoading] = React.useState(true)
 
   const [searchUrlTemplate, setSearchUrlTemplateState] = React.useState(() => {
     return getInitialSearchUrlTemplate(
@@ -162,19 +171,16 @@ export function ThemeProvider({
     [searchUrlTemplateStorageKey]
   )
 
-  const setDashboardWallpaper = React.useCallback(
-    (value: string | null) => {
-      if (value === null || value === "") {
-        localStorage.removeItem(dashboardWallpaperStorageKey)
-        setDashboardWallpaperState(null)
-        return
-      }
+  function setDashboardWallpaper(value: string | null) {
+    if (value === null || value === "") {
+      setDashboardWallpaperState(null)
+      idbClearWallpaper()
+      return
+    }
 
-      localStorage.setItem(dashboardWallpaperStorageKey, value)
-      setDashboardWallpaperState(value)
-    },
-    [dashboardWallpaperStorageKey]
-  )
+    setDashboardWallpaperState(value)
+    idbSaveWallpaper(value)
+  }
 
   const setTheme = React.useCallback(
     (nextTheme: Theme) => {
@@ -264,6 +270,41 @@ export function ThemeProvider({
   }, [accent, disableTransitionOnChange, theme])
 
   React.useEffect(() => {
+    let cancelled = false
+
+    async function initWallpaper() {
+      const oldDataUrl = localStorage.getItem(dashboardWallpaperStorageKey)
+      if (oldDataUrl && oldDataUrl.startsWith("data:")) {
+        await idbSaveWallpaper(oldDataUrl)
+        localStorage.removeItem(dashboardWallpaperStorageKey)
+        if (!cancelled) {
+          setDashboardWallpaperState(oldDataUrl)
+          setWallpaperLoading(false)
+        }
+        return
+      }
+
+      try {
+        const stored = await idbLoadWallpaper()
+        if (!cancelled && stored) {
+          setDashboardWallpaperState(stored)
+        }
+      } catch {
+        /* IndexedDB unavailable */
+      }
+
+      if (!cancelled) {
+        setWallpaperLoading(false)
+      }
+    }
+
+    initWallpaper()
+    return () => {
+      cancelled = true
+    }
+  }, [dashboardWallpaperStorageKey])
+
+  React.useEffect(() => {
     const handleStorageChange = (event: StorageEvent) => {
       if (event.storageArea !== localStorage) {
         return
@@ -287,13 +328,6 @@ export function ThemeProvider({
         return
       }
 
-      if (event.key === dashboardWallpaperStorageKey) {
-        setDashboardWallpaperState(
-          event.newValue && event.newValue !== "" ? event.newValue : null
-        )
-        return
-      }
-
       if (event.key === searchUrlTemplateStorageKey) {
         if (event.newValue !== null && event.newValue.trim() !== "") {
           setSearchUrlTemplateState(event.newValue.trim())
@@ -310,7 +344,6 @@ export function ThemeProvider({
     }
   }, [
     accentStorageKey,
-    dashboardWallpaperStorageKey,
     defaultAccent,
     defaultSearchUrlTemplate,
     defaultTheme,
@@ -325,6 +358,7 @@ export function ThemeProvider({
       accent,
       setAccent,
       dashboardWallpaper,
+      wallpaperLoading,
       setDashboardWallpaper,
       searchUrlTemplate,
       setSearchUrlTemplate,
@@ -332,9 +366,9 @@ export function ThemeProvider({
     [
       accent,
       dashboardWallpaper,
+      wallpaperLoading,
       searchUrlTemplate,
       setAccent,
-      setDashboardWallpaper,
       setSearchUrlTemplate,
       setTheme,
       theme,
