@@ -1,4 +1,4 @@
-import { Loader2, MessageSquare, Send, X } from "lucide-react"
+import { Loader2, MessageSquare, Send, Trash2, X } from "lucide-react"
 import { useCallback, useEffect, useMemo, useRef, useState } from "react"
 
 import { Button } from "@/components/ui/button"
@@ -25,6 +25,15 @@ The user may connect any OpenAI-compatible chat API (OpenAI, Ollama, Groq, proxi
 Always use the provided tools instead of inventing data. Prefer opening links in a new tab. Be concise. If a tool returns an error, explain briefly and suggest a fix.`
 
 const MAX_TOOL_ROUNDS = 14
+const MAX_CONTEXT_MESSAGES = 20
+const TOKEN_BUDGET = 100_000
+
+function estimateTokens(messages: Record<string, unknown>[]): number {
+  return messages.reduce((sum, m) => {
+    const text = typeof m.content === "string" ? m.content : JSON.stringify(m)
+    return sum + Math.ceil(text.length / 4)
+  }, 0)
+}
 
 type ChatTurn = {
   role: "user" | "assistant"
@@ -109,15 +118,26 @@ export function AssistantPanel({ open, onOpenChange }: AssistantPanelProps) {
         )
       }
 
+      const recentHistory =
+        historyIncludingLatestUser.length > MAX_CONTEXT_MESSAGES
+          ? historyIncludingLatestUser.slice(-MAX_CONTEXT_MESSAGES)
+          : historyIncludingLatestUser
+
       const apiMessages: Record<string, unknown>[] = [
         { role: "system", content: SYSTEM_PROMPT },
-        ...historyIncludingLatestUser.map((t) => ({
+        ...recentHistory.map((t) => ({
           role: t.role,
           content: t.content,
         })),
       ]
 
       for (let round = 0; round < MAX_TOOL_ROUNDS; round += 1) {
+        if (estimateTokens(apiMessages) > TOKEN_BUDGET * 0.8) {
+          throw new Error(
+            "Conversation too long for the model context — please clear the chat and try again."
+          )
+        }
+
         const res = await requestChatCompletion({
           baseUrl,
           apiKey,
@@ -238,16 +258,35 @@ export function AssistantPanel({ open, onOpenChange }: AssistantPanelProps) {
             />
             <h2 className="text-base font-semibold">Assistant</h2>
           </div>
-          <Button
-            type="button"
-            variant="ghost"
-            size="icon"
-            className="rounded-full"
-            aria-label="Close"
-            onClick={() => onOpenChange(false)}
-          >
-            <X className="size-5" strokeWidth={2} />
-          </Button>
+          <div className="flex items-center gap-1">
+            {turns.length > 0 && (
+              <Button
+                type="button"
+                variant="ghost"
+                size="icon"
+                className="rounded-full"
+                aria-label="Clear chat history"
+                title="Clear chat history"
+                onClick={() => {
+                  setTurns([])
+                  setError(null)
+                }}
+                disabled={busy}
+              >
+                <Trash2 className="size-4" strokeWidth={2} />
+              </Button>
+            )}
+            <Button
+              type="button"
+              variant="ghost"
+              size="icon"
+              className="rounded-full"
+              aria-label="Close"
+              onClick={() => onOpenChange(false)}
+            >
+              <X className="size-5" strokeWidth={2} />
+            </Button>
+          </div>
         </div>
 
         <div
@@ -321,6 +360,11 @@ export function AssistantPanel({ open, onOpenChange }: AssistantPanelProps) {
               <Send className="size-5" strokeWidth={2} />
             </Button>
           </div>
+          {turns.length >= 30 ? (
+            <p className="mt-2 text-center text-xs text-muted-foreground">
+              Long conversation — consider clearing for better responses
+            </p>
+          ) : null}
         </form>
       </aside>
     </>
