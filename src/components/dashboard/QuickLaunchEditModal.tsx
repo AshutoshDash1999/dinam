@@ -194,6 +194,12 @@ export function QuickLaunchEditModal({
                   setErrorMessage("Please provide a URL for all shortcuts.")
                   return
                 }
+                
+                // Block dangerous URL schemes
+                if (u.startsWith("javascript:") || u.startsWith("data:") || u.startsWith("vbscript:")) {
+                  setErrorMessage("Invalid URL scheme. Only http:// and https:// are allowed.")
+                  return
+                }
 
                 if (urls.has(u)) {
                   setErrorMessage(

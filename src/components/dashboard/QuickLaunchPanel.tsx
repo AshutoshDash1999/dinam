@@ -10,6 +10,7 @@ import {
 } from "@/components/ui/tooltip"
 import { Globe, MoreHorizontal } from "lucide-react"
 import { fetchQuickLinkMetadata, normalizeUrl } from "@/lib/quick-link-metadata"
+import { sanitizeUrl } from "@/lib/sanitizeUrl"
 import {
   useDashboardState,
   type QuickLaunchItem,
@@ -39,7 +40,6 @@ async function draftToItems(
     let description = slot.description
     let favicon = slot.favicon
 
-    // If url changed or it's new, we need to fetch if title/favicon is missing
     const isUrlChanged = !existing || existing.url !== url
 
     if (!isUrlChanged && existing) {
@@ -141,7 +141,7 @@ export function QuickLaunchPanel() {
             </Button>
           </div>
         </div>
-        
+
         {quickLaunchItems.length === 0 ? (
           <p className="mt-8 text-sm text-muted-foreground/60 text-center pb-4">
             No shortcuts yet.{" "}
@@ -159,9 +159,9 @@ export function QuickLaunchPanel() {
               {quickLaunchItems.slice(0, 7).map((item) => (
                 <a
                   key={item.id}
-                  href={item.url}
+                  href={sanitizeUrl(item.url)}
                   target="_blank"
-                  rel="noreferrer noopener"
+                  rel="noopener noreferrer"
                   className="shortcut-btn group"
                 >
                   <div className="icon-square shadow-xl group-hover:shadow-white/10 transition-shadow">
@@ -177,7 +177,7 @@ export function QuickLaunchPanel() {
                 </a>
               ))}
             </div>
-            
+
             {quickLaunchItems.length > 4 && (
               <div className="mt-8 flex gap-1.5">
                 <div className="size-1.5 rounded-full bg-foreground" />

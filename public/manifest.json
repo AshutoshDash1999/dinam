@@ -1,0 +1,18 @@
+{
+  "manifest_version": 3,
+  "name": "Dinam",
+  "version": "1.0.0",
+  "description": "A personal dashboard that replaces your new tab page.",
+  "chrome_url_overrides": {
+    "newtab": "index.html"
+  },
+  "permissions": ["storage"],
+  "content_security_policy": {
+    "extension_pages": "script-src 'self'; object-src 'self'"
+  },
+  "icons": {
+    "16": "icons/icon16.png",
+    "48": "icons/icon48.png",
+    "128": "icons/icon128.png"
+  }
+}

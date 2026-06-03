@@ -6,6 +6,9 @@ import { defineConfig } from "vite"
 // https://vite.dev/config/
 export default defineConfig({
   plugins: [react(), tailwindcss()],
+  build: {
+    modulePreload: { polyfill: false },
+  },
   server: {
     proxy: {
       // Browser calls same-origin `/stoic-quote` in dev to avoid CORS on stoic.tekloon.net.
