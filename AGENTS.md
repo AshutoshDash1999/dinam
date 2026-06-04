@@ -357,24 +357,11 @@ Key rules enforced:
 2. **Before submitting PR**: Run `npm run build` to verify production build
 3. **Auto-fix formatting**: Run `npm run format` before committing
 
-## Recommended Skills
+## Agent Skills
 
-Install relevant development skills from skills.sh for better contribution workflow.
+This repository includes the required agent skills configuration.
 
-### Frontend & UI
-
-```bash
-npx skills add vercel-labs/agent-skills --skill frontend-design
-npx skills add vercel-labs/agent-skills --skill react-patterns
-npx skills add vercel-labs/agent-skills --skill tailwind
-```
-
-### Code Quality
-
-```bash
-npx skills add vercel-labs/agent-skills --skill accessibility
-npx skills add vercel-labs/agent-skills --skill typescript-best-practices
-```
+Contributors and AI coding agents do not need to manually install skills. The repository configuration provides the necessary development guidance and best practices.
 
 ### Best Practices
 
