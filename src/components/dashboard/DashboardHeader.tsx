@@ -18,10 +18,8 @@ import {
   useSyncExternalStore,
 } from "react"
 
-import { cn } from "@/lib/utils"
 import { DashboardSettingsModal } from "@/components/dashboard/DashboardSettingsModal"
 import { LiveClock } from "@/components/dashboard/LiveClock"
-import { LiveGreeting } from "@/components/dashboard/LiveGreeting"
 import { useTheme } from "@/components/theme-provider"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -34,7 +32,8 @@ import {
   openGoogleSearchByImage,
   resolveNavigationHref,
 } from "@/lib/search-engine"
-
+import { useStoicQuote } from "@/lib/stoic-quote"
+import { cn } from "@/lib/utils"
 
 const COLOR_SCHEME_QUERY = "(prefers-color-scheme: dark)"
 
@@ -78,6 +77,7 @@ type DashboardHeaderProps = {
 }
 
 export function DashboardHeader({ onOpenAssistant }: DashboardHeaderProps) {
+  const quote = useStoicQuote()
   const { theme, setTheme, searchUrlTemplate } = useTheme()
   const [settingsOpen, setSettingsOpen] = useState(false)
   const [searchQuery, setSearchQuery] = useState("")
@@ -233,11 +233,9 @@ export function DashboardHeader({ onOpenAssistant }: DashboardHeaderProps) {
     <header className="relative w-full">
       <div className="flex items-start justify-between">
         <LiveClock />
-        
         <div className="flex-1" /> {/* Spacer */}
-        
         <div className="flex items-center gap-6">
-          <div className="flex shrink-0 items-center gap-1 opacity-40 hover:opacity-100 transition-opacity">
+          <div className="flex shrink-0 items-center gap-1 opacity-40 transition-opacity hover:opacity-100">
             <Tooltip>
               <TooltipTrigger asChild>
                 <Button
@@ -312,10 +310,16 @@ export function DashboardHeader({ onOpenAssistant }: DashboardHeaderProps) {
       />
 
       <div className="mt-4 flex flex-col items-center text-center">
-        <div className="mb-6">
-          <LiveGreeting />
+        <div className="mb-6 flex flex-col items-center gap-2">
+          <p className="text-center text-2xl leading-[0.9] font-bold tracking-tighter text-white select-none">
+            <span className="inline-block max-w-6xl leading-none text-balance">
+              {quote.text}
+            </span>
+          </p>
+          <span className="text-sm text-white/50 select-none">
+            — {quote.author}
+          </span>
         </div>
-
         <form
           className="relative w-full max-w-xl"
           onSubmit={handleSearchSubmit}
@@ -351,7 +355,7 @@ export function DashboardHeader({ onOpenAssistant }: DashboardHeaderProps) {
             }}
             placeholder="Search the web or type a URL"
             autoComplete="off"
-            className="h-11 rounded-full border-white/5 bg-white/5 px-12 text-sm transition-all focus:border-white/10 focus:bg-white/10 focus:ring-0 placeholder:text-muted-foreground/40"
+            className="h-11 rounded-full border-white/5 bg-white/5 px-12 text-sm transition-all placeholder:text-muted-foreground/40 focus:border-white/10 focus:bg-white/10 focus:ring-0"
           />
           <div className="absolute top-1/2 right-5 z-10 flex -translate-y-1/2 items-center gap-2">
             <Tooltip>
@@ -364,7 +368,11 @@ export function DashboardHeader({ onOpenAssistant }: DashboardHeaderProps) {
                   aria-label="Search by image on Google"
                   onClick={handleImageSearchPick}
                 >
-                  <ScanSearch className="size-4" strokeWidth={2.5} aria-hidden />
+                  <ScanSearch
+                    className="size-4"
+                    strokeWidth={2.5}
+                    aria-hidden
+                  />
                 </Button>
               </TooltipTrigger>
               <TooltipContent side="bottom" sideOffset={6}>
@@ -381,7 +389,7 @@ export function DashboardHeader({ onOpenAssistant }: DashboardHeaderProps) {
                     className={cn(
                       "size-7 shrink-0 rounded-full",
                       voiceListening
-                        ? "text-destructive hover:text-destructive animate-pulse"
+                        ? "animate-pulse text-destructive hover:text-destructive"
                         : "text-muted-foreground/60 hover:text-foreground"
                     )}
                     aria-label={
