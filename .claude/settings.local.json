@@ -8,7 +8,9 @@
       "Bash(ls -la \"e:\\\\Workspace\\\\dinam\\\\\" | head -30)",
       "Read(//e/Workspace/**)",
       "PowerShell(cd \"e:\\\\Workspace\\\\dinam\"; ls -Force | Where-Object { $_ -match \"coderabbit\" })",
-      "Bash(Remove-Item \"e:\\\\Workspace\\\\dinam\\\\src\\\\components\\\\dashboard\\\\QuoteCard.tsx\")"
+      "Bash(Remove-Item \"e:\\\\Workspace\\\\dinam\\\\src\\\\components\\\\dashboard\\\\QuoteCard.tsx\")",
+      "Bash(cd /d \"e:\\\\Workspace\\\\dinam\")",
+      "Bash(npx shadcn@latest add progress --yes)"
     ]
   }
 }
