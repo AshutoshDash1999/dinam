@@ -1,11 +1,14 @@
 # Dinam
+
 [![License: PolyForm Noncommercial 1.0.0](https://img.shields.io/badge/License-PolyForm%20Noncommercial%201.0.0-blue)](LICENSE)
 
-Dinam is a **Chrome extension** that replaces your **new tab** page with a personal dashboard. It brings quick launch shortcuts, bookmarks, a daily quote, tasks, and a tech news column into one responsive layout. Appearance is customizable: theme accents, optional wallpaper, and layout-adjacent settings live in the dashboard header.
+Dinam is a React + Vite personal dashboard app designed for a new-tab-style experience. It brings quick-launch shortcuts, browser bookmarks, a daily quote, focus items, market/news headlines, configurable search, and an optional assistant into one responsive layout.
 
-Data for bookmarks, tasks, news, and quick launch items is currently driven by mock modules under `src/data/`—a natural place to swap in real APIs, `chrome.storage`, or other persistence later.
+Appearance and behavior are customizable from the dashboard: light/dark/system theme, accent presets, optional wallpaper, search engine settings, and OpenAI-compatible assistant settings.
 
-If Dinam is useful to you, **star this repository on GitHub** — it helps others discover the project and keeps us motivated to improve it.
+Dashboard state is managed in `src/context/dashboard-state.tsx`. Focus items and quick-launch links persist in `localStorage`; wallpaper images are stored with IndexedDB; settings use browser storage; external quote and news data are fetched live and cached/fallback where appropriate.
+
+If Dinam is useful to you, **star this repository on GitHub** - it helps others discover the project and keeps us motivated to improve it.
 
 ## Table of Contents
 
@@ -14,21 +17,25 @@ If Dinam is useful to you, **star this repository on GitHub** — it helps other
 - [Fork & Clone Repository](#fork--clone-repository)
 - [Getting Started](#getting-started)
 - [Run Locally](#run-locally)
-- [Load as Chrome Extension](#load-as-chrome-extension)
+- [Browser Extension Status](#browser-extension-status)
+- [Scripts](#scripts)
+- [End-to-End Testing](#end-to-end-testing)
+- [Adding UI Components](#adding-ui-components)
 - [Project Layout](#project-layout)
 - [Contributing](#contributing)
 - [License](#license)
 
 ## Features
 
-- **New tab override** — The dashboard opens whenever you open a new tab (once packaged as an extension).
-- **Header** — Search (configurable provider), date/time, and dashboard settings
-- **Quick launch** — Editable grid of shortcuts with icon presets
-- **Bookmarks** — Curated links section
-- **Quote card** — Rotating stoic-style quotes
-- **Tasks** — Task list UI (mock data)
-- **Tech news** — Headlines column (mock data)
-- **Theming** — Light/dark/system, accent presets, optional background wallpaper
+- **Dashboard layout** - Responsive new-tab-style dashboard with focused sections
+- **Header** - Search, image search, voice search where supported, date/time, theme toggle, assistant entry point, and settings
+- **Quick launch** - Editable shortcut grid with fetched metadata and favicons
+- **Bookmarks** - Browser bookmark tree when browser APIs are available
+- **Quote card** - Daily quote fetched from a stoic quote API with cached fallback
+- **Focus items** - Local task list with progress and completion state
+- **Market/news headlines** - Hacker News/Algolia-powered headlines with local cache
+- **Theming** - Light/dark/system theme, accent presets, and optional compressed wallpaper
+- **Assistant** - Optional OpenAI-compatible chat assistant configured from settings
 
 ## Tech Stack
 
@@ -36,112 +43,101 @@ If Dinam is useful to you, **star this repository on GitHub** — it helps other
 - [Vite 7](https://vite.dev/)
 - [Tailwind CSS 4](https://tailwindcss.com/)
 - [shadcn/ui](https://ui.shadcn.com/) (Radix primitives, `class-variance-authority`, `tailwind-merge`)
+- [Playwright](https://playwright.dev/) for E2E tests
 
 ## Fork & Clone Repository
-1. Fork this repository
 
-2. Clone your fork
+1. Fork this repository.
+
+2. Clone your fork:
+
 ```bash
 git clone https://github.com/<your-username>/dinam.git
 cd dinam
 ```
-3. Add upstream remote (optional)
+
+3. Add the upstream remote (optional):
+
 ```bash
 git remote add upstream https://github.com/AshutoshDash1999/dinam.git
 ```
 
-## Getting started
+## Getting Started
 
-**Requirements:** Node.js compatible with the versions in `package.json` (recent LTS recommended).
+**Requirements:** Node.js compatible with the versions used by the project. CI currently uses Node.js 22.
 
-## Run Locally
-
-### 1. Install dependencies
+Install dependencies:
 
 ```bash
 npm install
 ```
 
-### 2. Start the development server
-```
+## Run Locally
+
+Start the Vite development server:
+
+```bash
 npm run dev
 ```
 
-Open the URL Vite prints (usually `http://localhost:5173`) for fast refresh while you work on the dashboard UI.
+Open the URL Vite prints, usually `http://localhost:5173`, for fast refresh while you work on the dashboard UI.
 
-## Load as Chrome Extension
-
-Dinam can also be tested as a Chrome new-tab extension.
-
-### 1. Build the project
+Preview a production build locally:
 
 ```bash
 npm run build
+npm run preview
 ```
 
-The production-ready files will be generated inside the `dist/` folder.
+## Browser Extension Status
 
-### 2. Open Chrome Extensions
+Dinam is designed for a new-tab dashboard experience, but the current repository does not include a Chrome extension manifest. `npm run build` produces a Vite web build in `dist/`; it does not currently produce a complete unpacked extension package.
 
-Open the following URL in Chrome:
+Until a `manifest.json` is added to `public/` or generated during build, test the dashboard with `npm run dev` or `npm run preview`.
 
-```text
-chrome://extensions
-```
+## Scripts
 
-Enable **Developer Mode** using the toggle in the top-right corner.
-
-### 3. Load the Extension
-
-Click **Load unpacked** and select the `dist/` folder containing the built files and `manifest.json`.
-
-### 4. Open a New Tab
-
-Once loaded successfully, opening a new Chrome tab will display the Dinam dashboard.
-
-After making changes, rebuild the project and reload the unpacked extension to view updates.
-
-### Scripts
-
-| Command             | Description                  |
-| ------------------- | ---------------------------- |
-| `npm run dev`       | Dev server with HMR          |
-| `npm run build`     | Typecheck + production build |
-| `npm run preview`   | Preview production build     |
-| `npm run lint`      | ESLint                       |
-| `npm run format`    | Prettier (TS/TSX)            |
-| `npm run typecheck` | TypeScript `--noEmit`        |
-
+| Command                  | Description                  |
+| ------------------------ | ---------------------------- |
+| `npm run dev`            | Dev server with HMR          |
+| `npm run build`          | Typecheck + production build |
+| `npm run preview`        | Preview production build     |
+| `npm run lint`           | ESLint                       |
+| `npm run format`         | Prettier for TS/TSX files    |
+| `npm run typecheck`      | TypeScript `--noEmit`        |
+| `npm run test:e2e`       | Run Playwright tests         |
+| `npm run test:e2e:ui`    | Run Playwright UI mode       |
+| `npm run test:e2e:headed` | Run headed Playwright tests  |
+| `npm run test:e2e:debug` | Debug Playwright tests       |
+| `npm run prepare`        | Initialize Husky hooks       |
 
 ## End-to-End Testing
 
 This project uses Playwright for automated end-to-end (E2E) testing across multiple browsers.
 
-### Run E2E Tests
+Run E2E tests:
 
 ```bash
 npm run test:e2e
 ```
 
-### Run Tests in Headed Mode
+Run tests in headed mode:
 
 ```bash
 npm run test:e2e:headed
 ```
 
-### Debug Tests
+Debug tests:
 
 ```bash
 npm run test:e2e:debug
 ```
 
-### Open Playwright HTML Report
+Open the Playwright HTML report:
 
 ```bash
 npx playwright show-report
 ```
-
-### Browser Coverage
 
 The E2E suite currently runs against:
 
@@ -152,9 +148,7 @@ The E2E suite currently runs against:
 
 ### CI Integration
 
-Playwright tests run automatically through GitHub Actions on:
-- Pull requests
-- Pushes to `master`
+GitHub Actions currently validates pull requests targeting `master` with lint, typecheck, and production build jobs. Playwright tests are available locally through the `test:e2e` scripts.
 
 ### Current Test Coverage
 
@@ -162,7 +156,7 @@ Playwright tests run automatically through GitHub Actions on:
 - Task creation flow
 - Theme persistence across reloads
 
-### Adding UI components
+## Adding UI Components
 
 This project uses the shadcn CLI. Example:
 
@@ -176,42 +170,52 @@ Components are added under `src/components/ui` and imported with the `@/` alias,
 import { Button } from "@/components/ui/button"
 ```
 
+## Project Layout
 
-## Project layout
 ```text
 src/
-├── components/
-│   ├── dashboard/      # Dashboard widgets and sections
-│   ├── ui/             # Reusable UI primitives
-├── data/               # Mock/static dashboard data
-├── lib/                # Utility helpers and theme logic
-├── App.tsx             # Main dashboard layout
+|-- components/
+|   |-- animated-icons/   # Local animated icon components
+|   |-- dashboard/        # Dashboard sections, dialogs, and assistant panel
+|   |-- ui/               # Reusable shadcn/ui primitives
+|   `-- theme-provider.tsx
+|-- config/               # Search engine presets
+|-- context/              # Dashboard state provider
+|-- data/                 # Static/fallback data where used
+|-- hooks/                # Browser, news, and dashboard hooks
+|-- lib/                  # Storage, search, theme, AI, and utility helpers
+|-- types/                # Shared TypeScript types
+|-- App.tsx               # Main dashboard layout
+|-- main.tsx              # React entry point and providers
+`-- index.css             # Tailwind CSS and theme tokens
 ```
 
 ## Contributing
 
 We welcome issues and pull requests. Please keep changes focused and consistent with existing patterns.
 
-### Before you open a PR
+### Before You Open a PR
 
-1. **Discuss larger changes** — For new features or structural refactors, open an issue first so direction and scope align.
-2. **One topic per PR** — Easier to review and bisect than mixed unrelated edits.
+1. **Discuss larger changes** - For new features or structural refactors, open an issue first so direction and scope align.
+2. **One topic per PR** - Easier to review and bisect than mixed unrelated edits.
 3. **Run checks locally:**
+
    ```bash
    npm run lint
    npm run typecheck
    ```
-   Fix any new warnings or errors. Use `npm run format` so TS/TSX matches Prettier (including Tailwind class sorting).
 
-4. **Match the codebase** — Follow existing naming, file organization, and import style (`@/` alias, imports at top of file). Avoid drive-by refactors outside your change.
-5. **Chrome / new tab** — When behavior depends on extension APIs, permissions, or the built bundle, verify with an unpacked load (see above) in addition to `npm run dev`.
-6. **Accessibility & semantics** — Prefer semantic HTML, labels for controls, and reasonable focus behavior when touching UI.
-7. **Commits** — Clear messages (imperative mood is fine: “Add bookmark drag handle”). Squash or keep history readable at your discretion unless maintainers request otherwise.
+   Fix any new warnings or errors. Use `npm run format` so TS/TSX matches Prettier, including Tailwind class sorting.
 
-### Reporting bugs
+4. **Match the codebase** - Follow existing naming, file organization, and import style (`@/` alias, imports at top of file). Avoid drive-by refactors outside your change.
+5. **Browser APIs** - When behavior depends on browser-only APIs such as bookmarks, notifications, clipboard, speech, or storage, verify the relevant runtime path in addition to `npm run dev`.
+6. **Accessibility & semantics** - Prefer semantic HTML, labels for controls, and reasonable focus behavior when touching UI.
+7. **Commits** - Clear messages in imperative mood are fine. Squash or keep history readable at your discretion unless maintainers request otherwise.
 
-Include: what you expected, what happened, Chrome version, OS, whether you saw it in **dev** (`npm run dev`) or **packed/unpacked extension**, and minimal steps to reproduce. Screenshots help for visual issues.
+### Reporting Bugs
+
+Include what you expected, what happened, browser version, OS, whether you saw it in dev or production preview, and minimal steps to reproduce. Screenshots help for visual issues.
 
 ## License
 
-[PolyForm Noncommercial License 1.0.0](LICENSE) — free for personal and noncommercial use. Commercial use requires explicit permission from the author.
+[PolyForm Noncommercial License 1.0.0](LICENSE) - free for personal and noncommercial use. Commercial use requires explicit permission from the author.
