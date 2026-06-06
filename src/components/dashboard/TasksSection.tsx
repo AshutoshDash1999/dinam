@@ -1,10 +1,13 @@
 "use client"
 
-import { Plus } from "lucide-react"
+import { CheckSquare, Plus } from "lucide-react"
 import { useRef, useState } from "react"
 
 import { dashboardSectionLabelClassName } from "@/components/dashboard/dashboard-section-label-classes"
 import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
+import { Progress } from "@/components/ui/progress"
+import { ScrollArea } from "@/components/ui/scroll-area"
 import { useDashboardState } from "@/context/dashboard-state"
 
 import { TaskItem } from "./TaskItem"
@@ -16,7 +19,6 @@ export function TasksSection() {
 
   const addTask = () => {
     const label = newTaskLabel.trim()
-
     if (!label) return
     addTodo(label, "", "", 0)
     setNewTaskLabel("")
@@ -24,78 +26,112 @@ export function TasksSection() {
   }
 
   const completedCount = todos.filter((t) => t.done).length
+  const pending = todos.filter((t) => !t.done)
+  const done = todos.filter((t) => t.done)
 
   return (
     <article className="glass-card flex min-h-0 flex-col p-6">
-      <div className="mb-6 flex items-center justify-between">
-        <h2 className={dashboardSectionLabelClassName}>Focus Items</h2>
+      <div className="mb-4 flex items-center justify-between">
+        <div className="flex items-center gap-3">
+          <h2 className={dashboardSectionLabelClassName}>Focus Items</h2>
+          {todos.length > 0 && (
+            <span className="text-[0.6rem] font-bold tabular-nums text-muted-foreground/40">
+              {completedCount}/{todos.length}
+            </span>
+          )}
+        </div>
         <div className="flex items-center gap-1">
           {completedCount > 0 && (
             <button
               type="button"
               onClick={clearCompletedTodos}
-              className="mr-2 text-[0.6rem] font-bold uppercase tracking-widest text-muted-foreground/40 transition-colors hover:text-destructive"
+              className="text-[0.6rem] font-bold uppercase tracking-widest text-muted-foreground/40 transition-colors hover:text-destructive"
             >
-              Clear ({completedCount})
+              Clear
             </button>
           )}
         </div>
       </div>
 
-      <div className="flex-1 min-h-0 overflow-y-auto pr-1 transition-all">
-        {!todos || todos.length === 0 ? (
-          <div className="flex flex-col items-center justify-center py-2 opacity-40">
-            <p className="text-xs font-medium">No focus items yet...</p>
+      {todos.length > 0 && (
+        <Progress
+          value={Math.round((completedCount / todos.length) * 100)}
+          className="mb-4 h-0.5"
+        />
+      )}
+
+      <ScrollArea className="flex-1 min-h-0 pr-1">
+        {todos.length === 0 ? (
+          <div className="flex flex-col items-center justify-center gap-2 py-6 opacity-40">
+            <CheckSquare className="size-8 stroke-[1.5]" />
+            <p className="text-xs font-medium">No focus items yet</p>
           </div>
         ) : (
-          <ul className="mb-4 flex flex-col gap-1">
-            {todos.map((todo) => (
-              <TaskItem
-                key={todo.id}
-                todo={todo}
-                onToggle={() => toggleTodo(todo.id)}
-                onDelete={() => deleteTodo(todo.id)}
-                onUpdate={(label) => updateTodo(todo.id, { label })}
-              />
-            ))}
-          </ul>
+          <>
+            {pending.length > 0 && (
+              <ul className="flex flex-col gap-1">
+                {pending.map((todo) => (
+                  <TaskItem
+                    key={todo.id}
+                    todo={todo}
+                    onToggle={() => toggleTodo(todo.id)}
+                    onDelete={() => deleteTodo(todo.id)}
+                    onUpdate={(label) => updateTodo(todo.id, { label })}
+                  />
+                ))}
+              </ul>
+            )}
+
+            {done.length > 0 && (
+              <div className="mt-3">
+                <div className="mb-1.5 flex items-center gap-2">
+                  <span className="text-[0.6rem] font-bold uppercase tracking-widest text-muted-foreground/30">
+                    Done
+                  </span>
+                  <div className="h-px flex-1 bg-border/40" />
+                </div>
+                <ul className="mb-2 flex flex-col gap-1 opacity-60">
+                  {done.map((todo) => (
+                    <TaskItem
+                      key={todo.id}
+                      todo={todo}
+                      onToggle={() => toggleTodo(todo.id)}
+                      onDelete={() => deleteTodo(todo.id)}
+                      onUpdate={(label) => updateTodo(todo.id, { label })}
+                    />
+                  ))}
+                </ul>
+              </div>
+            )}
+          </>
         )}
-      </div>
+      </ScrollArea>
 
-      <div className="mt-4 shrink-0 space-y-3 border-t border-border/50 pt-4">
-        <input
-          data-testid="task-input"
-          ref={taskInputRef}
-          type="text"
-          value={newTaskLabel}
-          onChange={(e) => setNewTaskLabel(e.target.value)}
-          onKeyDown={(e) => {
-            if (e.key === "Enter") addTask()
-          }}
-          placeholder="New task title…"
-          className="min-w-0 flex-1 rounded-xl border border-border/80 bg-card px-3 py-2 text-sm text-card-foreground outline-none"
-        />
-
-        <div className="flex flex-wrap items-center gap-3 rounded-xl border border-border/30 bg-muted/40 p-2.5">
+      <div className="mt-4 shrink-0 border-t border-border/50 pt-4">
+        <div className="flex items-center gap-2">
+          <Input
+            data-testid="task-input"
+            ref={taskInputRef}
+            type="text"
+            value={newTaskLabel}
+            onChange={(e) => setNewTaskLabel(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === "Enter") addTask()
+            }}
+            placeholder="New task title…"
+            className="min-w-0 flex-1"
+          />
           <Button
             data-testid="add-task-btn"
             type="button"
-            variant="ghost"
-            size="sm"
-            className="gap-1.5 text-xs text-primary"
             onClick={addTask}
+            disabled={!newTaskLabel.trim()}
+            className="h-9 shrink-0 rounded-xl border border-white/5 bg-white/5 px-4 text-xs font-semibold text-foreground shadow-sm transition-all hover:bg-white/10 active:scale-95 disabled:opacity-40"
           >
-            <Plus className="size-4" strokeWidth={2.5} /> Add
+            <Plus className="mr-1 size-3.5" strokeWidth={3} />
+            Add
           </Button>
         </div>
-        <Button
-          type="button"
-          onClick={addTask}
-          className="h-9 rounded-xl border border-white/5 bg-white/5 px-4 text-xs font-semibold text-foreground shadow-sm transition-all hover:bg-white/10 active:scale-95"
-        >
-          <Plus className="mr-1 size-3.5" strokeWidth={3} />
-          Add task
-        </Button>
       </div>
     </article>
   )

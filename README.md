@@ -188,6 +188,13 @@ src/
 ├── App.tsx             # Main dashboard layout
 ```
 
+## Additional Notes
+
+- Prioritize readability and maintainability over clever abstractions
+- Keep UI patterns visually consistent with existing components
+- Prefer composition over duplication
+- Test changes before submitting pull requests
+
 ## Contributing
 
 We welcome issues and pull requests. Please keep changes focused and consistent with existing patterns.

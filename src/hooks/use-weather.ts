@@ -1,5 +1,12 @@
 import { useEffect, useState } from "react"
 
+import { haversineKm } from "@/lib/geo-utils"
+import {
+  CACHE_TTL_MS,
+  readWeatherCache,
+  writeWeatherCache,
+} from "@/lib/weather-cache"
+
 type WeatherState = {
   city: string
   temperature: number
@@ -29,19 +36,33 @@ async function reverseGeocode(
 }
 
 export function useWeather() {
-  const [weather, setWeather] = useState<WeatherState>({
-    city: "",
-    temperature: 0,
-    weatherCode: 0,
+  const [weather, setWeather] = useState<WeatherState>(() => {
+    const c = readWeatherCache()
+    return c?.weather ?? { city: "", temperature: 0, weatherCode: 0 }
   })
 
-  const [weatherLoading, setWeatherLoading] = useState(true)
+  const [weatherLoading, setWeatherLoading] = useState(
+    () => !readWeatherCache()
+  )
   const [weatherError, setWeatherError] = useState("")
 
   useEffect(() => {
+    const cached = readWeatherCache()
+    const isFresh = cached && Date.now() - cached.timestamp < CACHE_TTL_MS
+
+    if (isFresh) return
+
     navigator.geolocation.getCurrentPosition(
       async (position) => {
         const { latitude, longitude } = position.coords
+
+        if (
+          cached &&
+          haversineKm(cached.lat, cached.lng, latitude, longitude) > 10
+        ) {
+          setWeather({ city: "", temperature: 0, weatherCode: 0 })
+          setWeatherLoading(true)
+        }
 
         try {
           const [weatherResponse, city] = await Promise.all([
@@ -56,49 +77,52 @@ export function useWeather() {
           }
 
           const weatherData = await weatherResponse.json()
-
           const currentWeather = weatherData.current_weather
 
           if (!currentWeather) {
             throw new Error("No weather data received")
           }
 
-          setWeather({
+          const fresh: WeatherState = {
             city,
             temperature: currentWeather.temperature ?? 0,
             weatherCode: currentWeather.weathercode ?? 0,
+          }
+
+          setWeather(fresh)
+          writeWeatherCache({
+            lat: latitude,
+            lng: longitude,
+            weather: fresh,
+            timestamp: Date.now(),
           })
-        } catch (error) {
-          console.error("Weather Error:", error)
-          setWeatherError("Unable to fetch weather")
+        } catch {
+          if (!cached) {
+            setWeatherError("Unable to fetch weather")
+          }
         } finally {
           setWeatherLoading(false)
         }
       },
       (error) => {
-        console.error(error)
-
-        if (error.code === 1) {
-          setWeatherError("Location permission denied")
-        } else if (error.code === 2) {
-          setWeatherError("Location unavailable")
-        } else {
-          setWeatherError("Location timeout")
+        if (!cached) {
+          if (error.code === 1) {
+            setWeatherError("Location permission denied")
+          } else if (error.code === 2) {
+            setWeatherError("Location unavailable")
+          } else {
+            setWeatherError("Location timeout")
+          }
         }
-
         setWeatherLoading(false)
       },
       {
-        enableHighAccuracy: true,
-        timeout: 10000,
-        maximumAge: 0,
+        enableHighAccuracy: false,
+        timeout: 8000,
+        maximumAge: 600_000,
       }
     )
   }, [])
 
-  return {
-    weather,
-    weatherLoading,
-    weatherError,
-  }
+  return { weather, weatherLoading, weatherError }
 }

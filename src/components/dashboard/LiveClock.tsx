@@ -1,6 +1,6 @@
+import { useWeather } from "@/hooks/use-weather"
 import dayjs from "dayjs"
 import { useEffect, useState } from "react"
-import { useWeather } from "@/hooks/use-weather"
 
 /**
  * Fully self-contained live clock status bar.
@@ -27,10 +27,10 @@ export function LiveClock() {
           • {dateLine}
         </span>
       </div>
-      <div className="mt-1.5 flex items-center gap-2 text-[0.75rem] font-bold uppercase tracking-wider text-muted-foreground/50">
+      <div className="mt-1.5 flex items-center gap-2 text-[0.75rem] font-bold tracking-wider text-muted-foreground/50 uppercase">
         {!weatherLoading && (
           <>
-            <span>{Math.round(weather.temperature)}°F</span>
+            <span>{Math.round(weather.temperature)}°C</span>
             <span>•</span>
             <span>{weather.city}</span>
           </>

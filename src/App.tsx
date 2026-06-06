@@ -3,9 +3,7 @@ import { useState } from "react"
 import { AssistantPanel } from "@/components/dashboard/AssistantPanel"
 import { BookmarksSection } from "@/components/dashboard/BookmarksSection"
 import { DashboardHeader } from "@/components/dashboard/DashboardHeader"
-import { QuoteCard } from "@/components/dashboard/QuoteCard"
 import { QuickLaunchPanel } from "@/components/dashboard/QuickLaunchPanel"
-
 import { TasksSection } from "@/components/dashboard/TasksSection"
 import { TechNewsSection } from "@/components/dashboard/TechNewsSection"
 import { useTheme } from "@/components/theme-provider"
@@ -38,7 +36,7 @@ const App = () => {
           />
         </>
       ) : null}
-      <div className="relative z-0 mx-auto w-full max-w-(--max-width-dashboard) px-8 pt-6 pb-10 lg:px-10 lg:pb-12">
+      <div className="relative z-0 mx-auto w-full max-w-dashboard px-8 pt-6 pb-10 lg:px-10 lg:pb-12">
         <DashboardHeader onOpenAssistant={() => setAssistantOpen(true)} />
 
         <div className="mt-8 grid grid-cols-1 gap-8 lg:mt-12 lg:grid-cols-12 lg:gap-8">
@@ -47,12 +45,11 @@ const App = () => {
             <BookmarksSection />
           </div>
           <div className="flex flex-col gap-8 lg:col-span-4">
-            <QuoteCard />
             <div className="min-h-0 flex-1">
               <TasksSection />
             </div>
           </div>
-          <div className="min-w-0 lg:col-span-3">
+          <div className="min-w-0 lg:col-span-4">
             <TechNewsSection />
           </div>
         </div>

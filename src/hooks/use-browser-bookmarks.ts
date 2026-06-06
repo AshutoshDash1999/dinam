@@ -9,16 +9,16 @@ import type { BrowserBookmark } from "@/types/browser-bookmarks"
 
 export function useBrowserBookmarks() {
   const [bookmarks, setBookmarks] = useState<BrowserBookmark[]>([])
-  const [loading, setLoading] = useState(true)
+  const [loadingBookmarks, setLoadingBookmarks] = useState(true)
 
   useEffect(() => {
     async function load() {
-      setLoading(true)
+      setLoadingBookmarks(true)
 
       const data = await getBrowserBookmarks()
 
       setBookmarks(data)
-      setLoading(false)
+      setLoadingBookmarks(false)
     }
 
     load()
@@ -32,6 +32,6 @@ export function useBrowserBookmarks() {
 
   return {
     bookmarks,
-    loading,
+    loadingBookmarks,
   }
 }
