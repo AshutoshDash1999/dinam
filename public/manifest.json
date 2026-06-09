@@ -6,7 +6,7 @@
   "chrome_url_overrides": {
     "newtab": "index.html"
   },
-  "permissions": ["storage"],
+  "permissions": ["geolocation", "bookmarks", "storage"],
   "content_security_policy": {
     "extension_pages": "script-src 'self'; object-src 'self'"
   },
@@ -14,5 +14,9 @@
     "16": "icons/icon16.png",
     "48": "icons/icon48.png",
     "128": "icons/icon128.png"
-  }
+  },
+  "host_permissions": [
+    "https://api.open-meteo.com/*",
+    "https://geocode.maps.co/*"
+  ]
 }
