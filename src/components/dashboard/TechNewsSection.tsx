@@ -4,27 +4,36 @@ import { dashboardSectionLabelClassName } from "@/components/dashboard/dashboard
 import { useTechNews } from "@/hooks/use-tech-news"
 
 export function TechNewsSection() {
-  const { news, status } = useTechNews()
+  const { news, status, lastUpdated, refreshNews } = useTechNews()
 
   return (
     <article className="glass-card flex h-full flex-col p-6">
       <div className="flex items-center justify-between">
         <h2 className={dashboardSectionLabelClassName}>Market Intelligence</h2>
-        <div className="flex items-center gap-1">
+        <div className="flex items-center gap-2">
           {status === "loading" && (
-            <RefreshCw className="size-3 animate-spin text-muted-foreground/30 mr-1" />
+            <RefreshCw className="size-3 animate-spin text-muted-foreground/30" />
           )}
+
+          <button
+            onClick={refreshNews}
+            aria-label="Refresh news"
+            className="rounded-md p-1 text-muted-foreground transition-colors hover:text-foreground"
+          >
+            <RefreshCw className="size-4" />
+          </button>
         </div>
       </div>
-
+      {lastUpdated && (
+        <p className="mt-2 text-[10px] text-muted-foreground/60">
+          Updated {new Date(lastUpdated).toLocaleTimeString()}
+        </p>
+      )}
       <div className="mt-6 flex-1">
         {status === "loading" && news.length === 0 ? (
           <ul className="flex flex-col gap-6">
             {[1, 2, 3].map((i) => (
-              <li
-                key={i}
-                className="flex items-start justify-between gap-4"
-              >
+              <li key={i} className="flex items-start justify-between gap-4">
                 <div className="min-w-0 flex-1 space-y-3">
                   <div className="h-2 w-24 animate-pulse rounded-full bg-muted-foreground/10" />
                   <div className="space-y-2">
@@ -38,7 +47,7 @@ export function TechNewsSection() {
         ) : status === "error" && news.length === 0 ? (
           <div className="flex h-full flex-col items-center justify-center text-center">
             <p className="text-sm text-muted-foreground/50">
-              Unable to load latest news.
+              Unable to load latest news. Please try refreshing.
             </p>
           </div>
         ) : (
@@ -60,18 +69,21 @@ export function TechNewsSection() {
                         • {item.timeAgo}
                       </span>
                     </div>
-                    <p className="mt-1 text-xs leading-snug font-semibold text-foreground/90 group-hover/news:text-foreground transition-colors overflow-hidden [display:-webkit-box] [-webkit-line-clamp:2] [-webkit-box-orient:vertical]">
+                    <p className="mt-1 [display:-webkit-box] overflow-hidden text-xs leading-snug font-semibold text-foreground/90 transition-colors [-webkit-box-orient:vertical] [-webkit-line-clamp:2] group-hover/news:text-foreground">
                       {item.headline}
                     </p>
                   </div>
                   <div
-                    className="flex size-14 shrink-0 items-center justify-center overflow-hidden rounded-xl bg-white/5 border border-white/5 shadow-sm group-hover/news:border-white/10 transition-colors"
+                    className="flex size-14 shrink-0 items-center justify-center overflow-hidden rounded-xl border border-white/5 bg-white/5 shadow-sm transition-colors group-hover/news:border-white/10"
                     aria-hidden
                   >
-                     <img
-                      src={item.faviconUrl || `https://www.google.com/s2/favicons?domain=${item.url}&sz=128`}
+                    <img
+                      src={
+                        item.faviconUrl ||
+                        `https://www.google.com/s2/favicons?domain=${item.url}&sz=128`
+                      }
                       alt=""
-                      className="size-full object-cover opacity-80 group-hover/news:opacity-100 group-hover/news:scale-105 transition-all"
+                      className="size-full object-cover opacity-80 transition-all group-hover/news:scale-105 group-hover/news:opacity-100"
                       onError={(e) => {
                         e.currentTarget.style.display = "none"
                         const fallback = e.currentTarget.nextElementSibling
@@ -81,7 +93,10 @@ export function TechNewsSection() {
                       }}
                     />
                     <div className="hidden size-full items-center justify-center bg-muted/20">
-                      <Globe className="size-5 text-muted-foreground/20" strokeWidth={1} />
+                      <Globe
+                        className="size-5 text-muted-foreground/20"
+                        strokeWidth={1}
+                      />
                     </div>
                   </div>
                 </a>
