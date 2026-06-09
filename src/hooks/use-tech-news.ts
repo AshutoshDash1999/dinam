@@ -13,6 +13,12 @@ export type NewsItem = {
   faviconUrl: string
 }
 
+type HackerNewsHit = {
+  objectID: string
+  title: string
+  url: string
+  created_at: string
+}
 type FetchStatus = "loading" | "success" | "error"
 
 const CACHE_KEY = "dinam-dashboard-tech-news"
@@ -61,28 +67,21 @@ export function useTechNews() {
       const data = await res.json()
 
       const fetchedItems: NewsItem[] = data.hits
-        .filter((hit: { title?: string; url?: string }) => hit.title && hit.url) // ensure valid data
-        .map(
-          (hit: {
-            objectID: string
-            title: string
-            url: string
-            created_at: string
-          }) => {
-            const urlObj = new URL(hit.url)
-            // Strip www. for cleaner source name
-            const source = urlObj.hostname.replace(/^www\./, "")
+        .filter((hit: Partial<HackerNewsHit>) => hit.title && hit.url)
+        .map(({ objectID, title, url, created_at }: HackerNewsHit) => {
+          const urlObj = new URL(url)
 
-            return {
-              id: hit.objectID,
-              headline: hit.title,
-              url: hit.url,
-              source: source,
-              timeAgo: dayjs(hit.created_at).fromNow(),
-              faviconUrl: `https://www.google.com/s2/favicons?domain=${source}&sz=64`,
-            }
+          const source = urlObj.hostname.replace(/^www\./, "")
+
+          return {
+            id: objectID,
+            headline: title,
+            url,
+            source,
+            timeAgo: dayjs(created_at).fromNow(),
+            faviconUrl: `https://www.google.com/s2/favicons?domain=${source}&sz=64`,
           }
-        )
+        })
 
       if (isMounted) {
         const timestamp = Date.now()
