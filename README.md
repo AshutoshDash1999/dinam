@@ -18,6 +18,7 @@ If Dinam is useful to you, **star this repository on GitHub** - it helps others 
 - [Getting Started](#getting-started)
 - [Run Locally](#run-locally)
 - [Browser Extension Status](#browser-extension-status)
+- [Production Release (Chrome Extension)](#production-release-chrome-extension)
 - [Scripts](#scripts)
 - [End-to-End Testing](#end-to-end-testing)
 - [Adding UI Components](#adding-ui-components)
@@ -90,10 +91,42 @@ npm run preview
 ```
 
 ## Browser Extension Status
+Dinam includes a Manifest V3 file in `public/manifest.json`, and `npm run build` copies it into `dist/` so you can load Dinam as an unpacked Chrome extension.
 
-Dinam is designed for a new-tab dashboard experience, but the current repository does not include a Chrome extension manifest. `npm run build` produces a Vite web build in `dist/`; it does not currently produce a complete unpacked extension package.
+Load it in Chrome:
 
-Until a `manifest.json` is added to `public/` or generated during build, test the dashboard with `npm run dev` or `npm run preview`.
+1. Run:
+   ```bash
+   npm run build
+   ```
+2. Open `chrome://extensions`
+3. Enable **Developer mode**
+4. Click **Load unpacked**
+5. Select the generated `dist/` folder
+
+After loading, opening a new tab should show the Dinam dashboard.
+## Production Release (Chrome Extension)
+Use this flow when preparing a Chrome Web Store-ready package:
+
+1. Ensure app and extension versions are in sync:
+   ```bash
+   npm run sync:manifest-version
+   ```
+2. Build and validate extension output:
+   ```bash
+   npm run build:extension
+   ```
+3. Create a release ZIP from `dist/`:
+   ```bash
+   npm run package:extension
+   ```
+4. Upload the generated ZIP in `release/` to the Chrome Web Store dashboard.
+
+Checklist before submitting:
+- `dist/manifest.json` exists and uses `manifest_version: 3`
+- `chrome_url_overrides.newtab` points to an existing file in `dist/`
+- icon files exist for 16/48/128 and are referenced in `manifest.json`
+- store listing includes description, screenshots, and privacy policy
 
 ## Scripts
 
@@ -101,6 +134,11 @@ Until a `manifest.json` is added to `public/` or generated during build, test th
 | ------------------------ | ---------------------------- |
 | `npm run dev`            | Dev server with HMR          |
 | `npm run build`          | Typecheck + production build |
+| `npm run sync:manifest-version` | Sync `public/manifest.json` version with `package.json` |
+| `npm run validate:extension` | Validate built extension artifacts in `dist/` |
+| `npm run build:extension` | Sync version, build, and validate extension output |
+| `npm run package:extension` | Create release ZIP for Chrome Web Store from `dist/` |
+| `npm run release:extension` | Run full extension release pipeline (build + package) |
 | `npm run preview`        | Preview production build     |
 | `npm run lint`           | ESLint                       |
 | `npm run format`         | Prettier for TS/TSX files    |

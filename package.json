@@ -6,6 +6,11 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",
+    "sync:manifest-version": "node scripts/sync-manifest-version.mjs",
+    "validate:extension": "node scripts/validate-extension.mjs",
+    "build:extension": "npm run sync:manifest-version && npm run build && npm run validate:extension",
+    "package:extension": "node scripts/package-extension.mjs",
+    "release:extension": "npm run build:extension && npm run package:extension",
     "lint": "eslint .",
     "format": "prettier --write \"**/*.{ts,tsx}\"",
     "typecheck": "tsc --noEmit",
