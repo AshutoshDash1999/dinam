@@ -76,4 +76,7 @@ jobs:
         run: npm ci
 
       - name: Run production build
-        run: npm run build
+        run: npm run build:extension
+
+      - name: Validate extension package generation
+        run: npm run package:extension
