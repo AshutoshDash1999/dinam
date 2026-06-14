@@ -11,7 +11,7 @@ import { BookmarkNode } from "@/components/dashboard/bookmarks/BookmarkNode"
 import { useBrowserBookmarks } from "@/hooks/use-browser-bookmarks"
 
 export function BookmarksSection() {
-  const { bookmarks, loadingBookmarks } = useBrowserBookmarks()
+  const { bookmarks, loadingBookmarks, bookmarksError } = useBrowserBookmarks()
 
   // Helper to pick icons based on title or random
   const getIconForBookmark = (title: string) => {
@@ -36,6 +36,11 @@ export function BookmarksSection() {
               <div className="h-3 flex-1 rounded bg-white/10" />
             </div>
           ))}
+        </div>
+      ) : bookmarksError ? (
+        <div className="px-2 py-1.5 text-xs text-foreground/50">
+          Unable to load browser bookmarks. Please check extension permissions and
+          try again.
         </div>
       ) : bookmarks.length === 0 ? (
         <div className="px-2 py-1.5 text-xs text-foreground/40">No bookmarks</div>
