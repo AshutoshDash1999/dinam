@@ -1,7 +1,7 @@
 "use client"
 
-import { StickyNote } from "lucide-react"
-import { useRef, useCallback } from "react"
+import { StickyNote, Copy, Check } from "lucide-react"
+import { useRef, useCallback, useState, useEffect } from "react"
 
 import { dashboardSectionLabelClassName } from "@/components/dashboard/dashboard-section-label-classes"
 import { useDashboardState } from "@/context/dashboard-state"
@@ -9,6 +9,21 @@ import { useDashboardState } from "@/context/dashboard-state"
 export function ScratchpadSection() {
   const { scratchpad, setScratchpad } = useDashboardState()
   const textareaRef = useRef<HTMLTextAreaElement>(null)
+  const [copied, setCopied] = useState(false)
+
+  // Clear copied state after 2 seconds
+  useEffect(() => {
+    if (copied) {
+      const t = setTimeout(() => setCopied(false), 2000)
+      return () => clearTimeout(t)
+    }
+  }, [copied])
+
+  const handleCopy = useCallback(() => {
+    if (!scratchpad) return
+    navigator.clipboard.writeText(scratchpad)
+    setCopied(true)
+  }, [scratchpad])
 
   const handleKeyDown = useCallback(
     (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
@@ -87,8 +102,8 @@ export function ScratchpadSection() {
           value={scratchpad}
           onChange={(e) => setScratchpad(e.target.value)}
           onKeyDown={handleKeyDown}
-          placeholder="Jot down a quick thought, type '- ' for bullets..."
-          className="min-h-[150px] flex-1 resize-none border-0 bg-transparent px-3 py-1 text-sm leading-relaxed text-foreground/90 shadow-none placeholder:text-muted-foreground/40 focus:outline-none focus-visible:ring-0"
+          placeholder="Jot down a quick thought..."
+          className="min-h-[150px] flex-1 resize-none border-0 bg-transparent px-3 py-1 text-sm leading-relaxed text-foreground/90 shadow-none [-ms-overflow-style:none] [scrollbar-width:none] placeholder:text-muted-foreground/40 focus:outline-none focus-visible:ring-0 [&::-webkit-scrollbar]:hidden"
           spellCheck={false}
         />
         {/* Subtle decorative elements for the "notepad" feel */}
@@ -103,6 +118,32 @@ export function ScratchpadSection() {
             {scratchpad.length > 0 ? `${scratchpad.length} chars` : "Ready"}
           </span>
         </div>
+        {scratchpad.length > 0 && (
+          <button
+            onClick={handleCopy}
+            className="group flex items-center gap-1.5 text-muted-foreground/40 transition-colors hover:text-foreground/80"
+            aria-label="Copy to clipboard"
+          >
+            {copied ? (
+              <>
+                <span className="text-[0.6rem] font-bold tracking-widest text-emerald-500 uppercase">
+                  Copied
+                </span>
+                <Check
+                  className="size-3.5 text-emerald-500"
+                  strokeWidth={2.5}
+                />
+              </>
+            ) : (
+              <>
+                <span className="text-[0.6rem] font-bold tracking-widest uppercase opacity-0 transition-opacity group-hover:opacity-100">
+                  Copy
+                </span>
+                <Copy className="size-3.5" strokeWidth={2.5} />
+              </>
+            )}
+          </button>
+        )}
       </div>
     </article>
   )
