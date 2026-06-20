@@ -33,8 +33,8 @@ export function ScratchpadSection() {
         const textBeforeCursor = target.value.slice(0, cursorPosition)
         const lastLine = textBeforeCursor.split("\n").pop() || ""
 
-        // Match list patterns: "- ", "* ", or "1. "
-        const match = lastLine.match(/^(\s*)([-*]|\d+\.)\s+(.*)/)
+        // Match list patterns: "- ", "* ", or "1." (with or without trailing space)
+        const match = lastLine.match(/^(\s*)([-*]|\d+\.)\s*(.*)/)
 
         if (match) {
           e.preventDefault()
@@ -42,8 +42,8 @@ export function ScratchpadSection() {
           const listMarker = match[2]
           const content = match[3]
 
-          // If the list item is empty and we press enter, exit the list
-          if (!content.trim()) {
+          // If the list item is completely empty (just the marker), exit the list
+          if (lastLine.trim() === listMarker) {
             const newText =
               target.value.slice(0, cursorPosition - lastLine.length) +
               target.value.slice(cursorPosition)
