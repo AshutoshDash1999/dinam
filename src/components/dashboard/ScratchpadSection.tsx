@@ -1,6 +1,6 @@
 "use client"
 
-import { StickyNote, Copy, Check } from "lucide-react"
+import { StickyNote, Copy, Check, Trash2 } from "lucide-react"
 import { useRef, useCallback, useState, useEffect } from "react"
 
 import { dashboardSectionLabelClassName } from "@/components/dashboard/dashboard-section-label-classes"
@@ -117,32 +117,46 @@ export function ScratchpadSection() {
             {scratchpad.length > 0 ? `${scratchpad.length} chars` : "Ready"}
           </span>
         </div>
-        {scratchpad.length > 0 && (
-          <button
-            onClick={handleCopy}
-            className="group flex items-center gap-1.5 text-muted-foreground/40 transition-colors hover:text-foreground/80"
-            aria-label="Copy to clipboard"
-          >
-            {copied ? (
-              <>
-                <span className="text-[0.6rem] font-bold tracking-widest text-emerald-500 uppercase">
-                  Copied
-                </span>
-                <Check
-                  className="size-3.5 text-emerald-500"
-                  strokeWidth={2.5}
-                />
-              </>
-            ) : (
-              <>
-                <span className="text-[0.6rem] font-bold tracking-widest uppercase opacity-0 transition-opacity group-hover:opacity-100">
-                  Copy
-                </span>
-                <Copy className="size-3.5" strokeWidth={2.5} />
-              </>
-            )}
-          </button>
-        )}
+        <div className="flex items-center gap-3">
+          {scratchpad.length > 0 && (
+            <button
+              onClick={() => setScratchpad("")}
+              className="group flex items-center gap-1.5 text-muted-foreground/40 transition-colors hover:text-destructive"
+              aria-label="Clear scratchpad"
+            >
+              <span className="text-[0.6rem] font-bold tracking-widest uppercase opacity-0 transition-opacity group-hover:opacity-100">
+                Clear
+              </span>
+              <Trash2 className="size-3.5" strokeWidth={2.5} />
+            </button>
+          )}
+          {scratchpad.length > 0 && (
+            <button
+              onClick={handleCopy}
+              className="group flex items-center gap-1.5 text-muted-foreground/40 transition-colors hover:text-foreground/80"
+              aria-label="Copy to clipboard"
+            >
+              {copied ? (
+                <>
+                  <span className="text-[0.6rem] font-bold tracking-widest text-emerald-500 uppercase">
+                    Copied
+                  </span>
+                  <Check
+                    className="size-3.5 text-emerald-500"
+                    strokeWidth={2.5}
+                  />
+                </>
+              ) : (
+                <>
+                  <span className="text-[0.6rem] font-bold tracking-widest uppercase opacity-0 transition-opacity group-hover:opacity-100">
+                    Copy
+                  </span>
+                  <Copy className="size-3.5" strokeWidth={2.5} />
+                </>
+              )}
+            </button>
+          )}
+        </div>
       </div>
     </article>
   )
