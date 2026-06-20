@@ -40,7 +40,6 @@ export function ScratchpadSection() {
           e.preventDefault()
           const prefixSpaces = match[1]
           const listMarker = match[2]
-          const content = match[3]
 
           // If the list item is completely empty (just the marker), exit the list
           if (lastLine.trim() === listMarker) {
