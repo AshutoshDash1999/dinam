@@ -121,37 +121,37 @@ export function ScratchpadSection() {
           {scratchpad.length > 0 && (
             <button
               onClick={() => setScratchpad("")}
-              className="group flex items-center gap-1.5 text-muted-foreground/40 transition-colors hover:text-destructive"
+              className="group flex items-center text-muted-foreground/40 transition-colors hover:text-destructive"
               aria-label="Clear scratchpad"
             >
-              <span className="text-[0.6rem] font-bold tracking-widest uppercase opacity-0 transition-opacity group-hover:opacity-100">
+              <Trash2 className="size-3.5 shrink-0" strokeWidth={2.5} />
+              <span className="max-w-0 overflow-hidden text-[0.6rem] font-bold tracking-widest whitespace-nowrap uppercase opacity-0 transition-all duration-300 ease-in-out group-hover:ml-1.5 group-hover:max-w-[40px] group-hover:opacity-100">
                 Clear
               </span>
-              <Trash2 className="size-3.5" strokeWidth={2.5} />
             </button>
           )}
           {scratchpad.length > 0 && (
             <button
               onClick={handleCopy}
-              className="group flex items-center gap-1.5 text-muted-foreground/40 transition-colors hover:text-foreground/80"
+              className="group flex items-center text-muted-foreground/40 transition-colors hover:text-foreground/80"
               aria-label="Copy to clipboard"
             >
               {copied ? (
                 <>
-                  <span className="text-[0.6rem] font-bold tracking-widest text-emerald-500 uppercase">
-                    Copied
-                  </span>
                   <Check
-                    className="size-3.5 text-emerald-500"
+                    className="size-3.5 shrink-0 text-emerald-500"
                     strokeWidth={2.5}
                   />
+                  <span className="ml-1.5 text-[0.6rem] font-bold tracking-widest whitespace-nowrap text-emerald-500 uppercase">
+                    Copied
+                  </span>
                 </>
               ) : (
                 <>
-                  <span className="text-[0.6rem] font-bold tracking-widest uppercase opacity-0 transition-opacity group-hover:opacity-100">
+                  <Copy className="size-3.5 shrink-0" strokeWidth={2.5} />
+                  <span className="max-w-0 overflow-hidden text-[0.6rem] font-bold tracking-widest whitespace-nowrap uppercase opacity-0 transition-all duration-300 ease-in-out group-hover:ml-1.5 group-hover:max-w-[40px] group-hover:opacity-100">
                     Copy
                   </span>
-                  <Copy className="size-3.5" strokeWidth={2.5} />
                 </>
               )}
             </button>
