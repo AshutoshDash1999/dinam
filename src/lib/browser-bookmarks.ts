@@ -11,14 +11,9 @@ function mapBookmarkNode(
   }
 }
 
-export async function getBrowserBookmarks(): Promise<
-  BrowserBookmark[]
-> {
+export async function getBrowserBookmarks(): Promise<BrowserBookmark[]> {
   return new Promise((resolve, reject) => {
-    if (
-      typeof chrome === "undefined" ||
-      !chrome.bookmarks
-    ) {
+    if (typeof chrome === "undefined" || !chrome.bookmarks) {
       resolve([])
       return
     }
@@ -26,11 +21,7 @@ export async function getBrowserBookmarks(): Promise<
     try {
       chrome.bookmarks.getTree((tree) => {
         if (chrome.runtime.lastError) {
-          reject(
-            new Error(
-              chrome.runtime.lastError.message
-            )
-          )
+          reject(new Error(chrome.runtime.lastError.message))
           return
         }
 
@@ -42,13 +33,8 @@ export async function getBrowserBookmarks(): Promise<
   })
 }
 
-export function subscribeToBookmarkChanges(
-  callback: () => void
-) {
-  if (
-    typeof chrome === "undefined" ||
-    !chrome.bookmarks
-  ) {
+export function subscribeToBookmarkChanges(callback: () => void) {
+  if (typeof chrome === "undefined" || !chrome.bookmarks) {
     return () => {}
   }
 
@@ -57,16 +43,10 @@ export function subscribeToBookmarkChanges(
   chrome.bookmarks.onChanged.addListener(callback)
 
   return () => {
-    chrome.bookmarks.onCreated.removeListener(
-      callback
-    )
+    chrome.bookmarks.onCreated.removeListener(callback)
 
-    chrome.bookmarks.onRemoved.removeListener(
-      callback
-    )
+    chrome.bookmarks.onRemoved.removeListener(callback)
 
-    chrome.bookmarks.onChanged.removeListener(
-      callback
-    )
+    chrome.bookmarks.onChanged.removeListener(callback)
   }
 }

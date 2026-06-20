@@ -26,7 +26,7 @@ export function LiveGreeting() {
 
   return (
     <div className="flex items-center justify-center">
-      <p className="text-center text-5xl md:text-6xl lg:text-7xl font-bold tracking-tighter text-white select-none leading-[0.9]">
+      <p className="text-center text-5xl leading-[0.9] font-bold tracking-tighter text-white select-none md:text-6xl lg:text-7xl">
         <span className="inline-block max-w-xl leading-[1] text-balance">
           {greeting.text}
         </span>

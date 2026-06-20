@@ -6,6 +6,7 @@ import { DashboardHeader } from "@/components/dashboard/DashboardHeader"
 import { QuickLaunchPanel } from "@/components/dashboard/QuickLaunchPanel"
 import { TasksSection } from "@/components/dashboard/TasksSection"
 import { TechNewsSection } from "@/components/dashboard/TechNewsSection"
+import { ScratchpadSection } from "@/components/dashboard/ScratchpadSection"
 import { useTheme } from "@/components/theme-provider"
 import { cn } from "@/lib/utils"
 
@@ -47,6 +48,9 @@ const App = () => {
           <div className="flex flex-col gap-8 lg:col-span-4">
             <div className="min-h-0 flex-1">
               <TasksSection />
+            </div>
+            <div className="min-h-0 flex-1">
+              <ScratchpadSection />
             </div>
           </div>
           <div className="min-w-0 lg:col-span-4">

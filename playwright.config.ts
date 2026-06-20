@@ -1,7 +1,7 @@
-import { defineConfig, devices } from '@playwright/test';
+import { defineConfig, devices } from "@playwright/test"
 
 export default defineConfig({
-  testDir: './tests/e2e',
+  testDir: "./tests/e2e",
 
   fullyParallel: true,
 
@@ -11,52 +11,52 @@ export default defineConfig({
 
   workers: process.env.CI ? 2 : undefined,
 
-  reporter: 'html',
+  reporter: "html",
 
   use: {
-    baseURL: 'http://localhost:5173',
+    baseURL: "http://localhost:5173",
 
-    trace: 'retain-on-failure',
+    trace: "retain-on-failure",
 
-    screenshot: 'only-on-failure',
+    screenshot: "only-on-failure",
 
-    video: 'retain-on-failure',
+    video: "retain-on-failure",
   },
 
   webServer: {
-    command: 'npm run dev',
-    url: 'http://localhost:5173',
+    command: "npm run dev",
+    url: "http://localhost:5173",
     reuseExistingServer: !process.env.CI,
     timeout: 120 * 1000,
   },
 
   projects: [
     {
-      name: 'chromium',
+      name: "chromium",
       use: {
-        ...devices['Desktop Chrome'],
+        ...devices["Desktop Chrome"],
       },
     },
 
     {
-      name: 'firefox',
+      name: "firefox",
       use: {
-        ...devices['Desktop Firefox'],
+        ...devices["Desktop Firefox"],
       },
     },
 
     {
-      name: 'webkit',
+      name: "webkit",
       use: {
-        ...devices['Desktop Safari'],
+        ...devices["Desktop Safari"],
       },
     },
 
     {
-      name: 'Mobile Chrome',
+      name: "Mobile Chrome",
       use: {
-        ...devices['Pixel 5'],
+        ...devices["Pixel 5"],
       },
     },
   ],
-});
+})

@@ -1,0 +1,100 @@
+[OPEN] PR #138: Handle Chrome bookmarks API failures safely
+[OPEN] ISSUE #137: [Feature]: Add bookmark search functionality
+[CLOSED] PR #136: docs(architecture): add ARCHITECTURE.md with system and component dia…
+[OPEN] PR #135: Add bookmark search functionality
+[CLOSED] PR #134: feat: productionize chrome extension build, packaging, validation, docs, and CI artifact workflows
+[CLOSED] PR #133: feat: add refresh control, fallback cache, and last updated indicator to Market Intelligence
+[CLOSED] PR #132: docs: align documentation with current app structure
+[CLOSED] ISSUE #131: [Feature]: [Docs] Align README and CONTRIBUTING with the current application structure and setup flow
+[CLOSED] PR #130: perf: cache weather data and reduce GPS requests on new tab opens (#117)
+[CLOSED] ISSUE #129: [Feature]: Enhance Market Intelligence Section with Category Filters, Refresh Control, and Improved News Sources
+[CLOSED] PR #128: ci: align Node.js versions across workflows
+[CLOSED] ISSUE #127: [Feature]: [CI] Align Node.js versions across CI workflows
+[CLOSED] PR #126: fix: add message pruning and clear chat to prevent unbounded history growth (#116)
+[CLOSED] ISSUE #125: [Bug]: README and UI contain garbled text and outdated project structure references
+[CLOSED] ISSUE #124: [Bug]: Task updates through assistant tools can create inconsistent task state
+[OPEN] ISSUE #123: [Bug]: Browser bookmarks section can remain stuck in loading state when Chrome bookmarks API fails
+[OPEN] ISSUE #122: [Bug]: Dashboard bookmarks are not rendered correctly because browser bookmarks and saved bookmarks are mixed
+[CLOSED] ISSUE #121: [Bug]: Chrome extension build cannot be loaded because manifest.json is missing
+[CLOSED] ISSUE #120: Documentation: Create docs/ARCHITECTURE.md for Dinam
+[CLOSED] PR #119: fix: add manifest.json, MV3 CSP, and URL sanitization to prevent script injection
+[CLOSED] PR #118: fix: migrate wallpaper to IndexedDB and add localStorage quota protection (#114)
+[CLOSED] ISSUE #117: [Performance] Weather requests fresh GPS on every new tab — enableHighAccuracy with maximumAge:0 causes delay and battery drain
+[CLOSED] ISSUE #116: [Bug] Chat history grows without bounds — no message pruning causes API failures and escalating costs
+[CLOSED] ISSUE #115: [Bug] Task dates display wrong day for users west of UTC — formatTaskDate mixes UTC and local time
+[CLOSED] ISSUE #114: [Bug] Wallpaper data URL can exhaust localStorage quota — task and bookmark saves silently fail causing data loss
+[CLOSED] ISSUE #113: [Security] AI tool settings_set_search_url_template accepts javascript: protocol — enables persistent XSS on every search
+[CLOSED] PR #112: fix: preserve task input focus after adding new task
+[CLOSED] PR #111: fix: add timeout handling for AI chat completion requests
+[CLOSED] ISSUE #110: [Bug]: [Security] Stored XSS via AI Bookmark Tool (javascript: URI Scheme Injection)
+[CLOSED] ISSUE #109: [Bug]: [Security] DOM-based Cross-Site Scripting (XSS) via javascript: URI Scheme in Search Box
+[CLOSED] ISSUE #108: [UX]:  Preserve task input focus after adding a new task
+[CLOSED] PR #107: feat: add playwright e2e testing infrastructure
+[CLOSED] ISSUE #106: [Bug] AI chat completion requests can hang indefinitely due to missing fetch timeout
+[CLOSED] ISSUE #105: UX bug: Disable 'Add' task button when input is empty or whitespace
+[CLOSED] PR #104: docs: add GitHub issue and PR templates
+[CLOSED] PR #103: ci: add minimal PR validation workflow
+[CLOSED] PR #102: fix: update draftKey handling in QuickLaunch components and increment…
+[CLOSED] ISSUE #101: [UI/UX] Add drag-and-drop reordering support for Quick Launch shortcuts
+[CLOSED] PR #100: feat: implement fully functional Bookmarks Management UI
+[CLOSED] PR #99: feat: add Copy-to-Clipboard & Refresh Quote actions to Stoic Quote card
+[CLOSED] PR #98: feat: add manual reload button to Tech News widget
+[CLOSED] ISSUE #97: feat: implement fully functional Bookmarks Management UI
+[CLOSED] ISSUE #96: feat: add Copy-to-Clipboard & Refresh Quote actions to Stoic Quote card
+[CLOSED] ISSUE #95: feat: add manual force refresh button to Tech News widget
+[CLOSED] ISSUE #94: feat: add daily focus widget to personalize dashboard workflow
+[CLOSED] PR #93: Fix LiveClock runtime error caused by MOCK_WEATHER import mismatch
+[CLOSED] PR #92: feat: integrate realtime browser bookmarks with optimized overflow handling
+[CLOSED] PR #91: docs: add AI coding agent guidelines
+[CLOSED] ISSUE #90: feat: Replace mock tech news data with a real live feed (Hacker News API or RSS proxy)
+[CLOSED] ISSUE #89: feat: Add Pomodoro / Focus Timer widget to the dashboard
+[CLOSED] ISSUE #88: feat: Persist tasks using chrome.storage.local with localStorage fallback for dev
+[CLOSED] PR #87: Fix(Security): Resolve Stored XSS via strict URL validation (#86)
+[CLOSED] ISSUE #86: [Security] Stored XSS via AI Bookmark Tool (`javascript:` URI Scheme Injection)
+[CLOSED] PR #85: feat: Implement Live Weather Widget in Dashboard Header (#84)
+[CLOSED] ISSUE #84: [Feature] Implement Weather Widget in the Dashboard Header
+[CLOSED] PR #83: Fix(Security): Resolve DOM-based XSS vulnerability in search routing
+[CLOSED] ISSUE #82: [Security] DOM-based Cross-Site Scripting (XSS) via `javascript:` URI Scheme in Search Box
+[CLOSED] ISSUE #81: [BUG/FEATURE]: No Content Security Policy (CSP) Defined in manifest.json , Extension Vulnerable to Script Injection
+[CLOSED] ISSUE #80: [FEATURE/ARCHITECTURE]: Replace All Mock Data Modules with chrome.storage.sync for Real Persistence Across Devices
+[CLOSED] ISSUE #79: feat(UI/UX): add smooth card-lift hover animations and fix duplicate icons
+[CLOSED] PR #78: feat: add streaming support (SSE) for chat completions in AssistantPanel
+[CLOSED] PR #77: feat(tasks): add drag-and-drop reordering to Focus Tasks (#75)
+[CLOSED] PR #76: ci: add validation workflow for lint, typecheck, and build
+[CLOSED] ISSUE #75: [FEATURE] Add Drag-and-Drop Reordering to Focus Tasks
+[CLOSED] ISSUE #74: [UI/UX] Add customizable dashboard widget visibility controls
+[CLOSED] PR #73: feat: implement husky with conventional commit linting rules
+[CLOSED] ISSUE #72: [FEATURE]: Add End-to-End Testing Infrastructure with Playwright + CI Integration
+[CLOSED] PR #71: Add issue and pull request templates
+[CLOSED] ISSUE #70: [FEATURE]: Add GitHub Actions workflow for lint, typecheck, and build validation
+[CLOSED] ISSUE #69: Feature: Replace Hardcoded Bookmarks with Real-Time Browser Bookmark Integration
+[CLOSED] ISSUE #68: feat: Add Streaming Support (Server-Sent Events) for Chat Completions in AssistantPanel
+[CLOSED] ISSUE #67: Bug: Message textarea in AssistantPanel overlaps the Send button on multi-line text input
+[CLOSED] PR #66: Fix unbounded event loops and cascading renders in BackgroundBlobs (#65)
+[CLOSED] ISSUE #65: [BUG] : Unbounded event loops in BackgroundBlobs layout and missing window state unmount cleanups causing performance degradation
+[CLOSED] PR #64: (UI/UX): improved the design dashboard page of the extension
+[CLOSED] ISSUE #63: Implement husky for stricter commit linting
+[CLOSED] PR #62: fix: update page title from vite-app to Dinam and add meta description (#44)
+[CLOSED] ISSUE #61: Repo compatible for coding agents
+[CLOSED] ISSUE #60: Issue and PR template for the repo
+[CLOSED] ISSUE #59: UI/UX improvement for the dashboard
+[CLOSED] PR #58: fix(a11y): add accessible labels to task form inputs (#43)
+[CLOSED] PR #57: fix:Enhance README documentation and contributor onboarding
+[CLOSED] PR #56: fix: resolve actual city name via reverse geocoding instead of hardcoded Pune (#40)
+[CLOSED] PR #55: fix(agent): validate browser_open_url protocols (#42)
+[CLOSED] ISSUE #54: Enhance README.md Documentation
+[CLOSED] ISSUE #53: Add CODE_OF_CONDUCT.md for Community Guidelines
+[CLOSED] PR #52: fix(agent): validate browser_open_url protocols
+[CLOSED] PR #51: Fix/task accessibility labels
+[CLOSED] PR #50: Fix/update page title
+[CLOSED] PR #49: fix(quicklaunch): use stable keys for draft links
+[CLOSED] ISSUE #48: [Bug] Unstable/Index-based keys in QuickLaunchEditModal cause input value misalignment on row deletion
+[CLOSED] ISSUE #47: bug: weather widget always shows "Pune, Maharashtra" regardless of user location
+[CLOSED] PR #46: fix: remove duplicate setInterval in DashboardHeader (#39)
+[CLOSED] PR #45: feat(dashboard): integrate live news API to replace mock data
+[CLOSED] ISSUE #44: [Bug] Page title still shows default 'vite-app' instead of 'Dinam'
+[CLOSED] ISSUE #43: [Accessibility] Task form inputs missing accessible labels for screen readers
+[CLOSED] ISSUE #42: [Security] browser_open_url agent tool accepts arbitrary URL protocols without validation
+[CLOSED] PR #41: feat(dashboard): add quick links with URL metadata fetching
+[CLOSED] ISSUE #40: [Bug] Weather city name hardcoded to 'Pune, Maharashtra' regardless of user location
+[CLOSED] ISSUE #39: [Bug] Duplicate interval timers in DashboardHeader causing double re-renders

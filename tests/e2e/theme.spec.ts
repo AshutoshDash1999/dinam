@@ -1,11 +1,11 @@
-import { test, expect } from '@playwright/test';
+import { test, expect } from "@playwright/test"
 
-test('theme persists after reload', async ({ page }) => {
-  await page.goto('/');
+test("theme persists after reload", async ({ page }) => {
+  await page.goto("/")
 
-  await page.getByTestId('theme-toggle').click();
+  await page.getByTestId("theme-toggle").click()
 
-  await page.reload();
+  await page.reload()
 
-  await expect(page.locator('html')).toHaveClass(/dark/);
-});
+  await expect(page.locator("html")).toHaveClass(/dark/)
+})

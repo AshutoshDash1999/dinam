@@ -27,7 +27,7 @@ export function BookmarkNode({
         className="w-full max-w-full min-w-0 overflow-hidden"
       >
         <BookmarkFolder node={node}>
-          <div className="w-full min-w-0 max-w-full space-y-1 overflow-hidden">
+          <div className="w-full max-w-full min-w-0 space-y-1 overflow-hidden">
             {children.map((child) => (
               <BookmarkNode key={child.id} node={child} depth={depth + 1} />
             ))}

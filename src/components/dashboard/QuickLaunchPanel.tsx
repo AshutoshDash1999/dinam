@@ -143,7 +143,7 @@ export function QuickLaunchPanel() {
         </div>
 
         {quickLaunchItems.length === 0 ? (
-          <p className="mt-8 text-sm text-muted-foreground/60 text-center pb-4">
+          <p className="mt-8 pb-4 text-center text-sm text-muted-foreground/60">
             No shortcuts yet.{" "}
             <button
               type="button"
@@ -155,7 +155,7 @@ export function QuickLaunchPanel() {
           </p>
         ) : (
           <div className="mt-8 flex flex-col items-center">
-            <div className="flex flex-wrap justify-center gap-x-6 gap-y-8 w-full">
+            <div className="flex w-full flex-wrap justify-center gap-x-6 gap-y-8">
               {quickLaunchItems.slice(0, 7).map((item) => (
                 <a
                   key={item.id}
@@ -164,14 +164,14 @@ export function QuickLaunchPanel() {
                   rel="noopener noreferrer"
                   className="shortcut-btn group"
                 >
-                  <div className="icon-square shadow-xl group-hover:shadow-white/10 transition-shadow">
+                  <div className="icon-square shadow-xl transition-shadow group-hover:shadow-white/10">
                     {item.favicon ? (
                       <img src={item.favicon} alt="" />
                     ) : (
                       <Globe className="size-6 text-black/50" />
                     )}
                   </div>
-                  <span className="truncate max-w-[64px] group-hover:text-foreground transition-colors">
+                  <span className="max-w-[64px] truncate transition-colors group-hover:text-foreground">
                     {item.title}
                   </span>
                 </a>

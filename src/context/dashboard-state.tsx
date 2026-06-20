@@ -77,6 +77,7 @@ const DEFAULT_QUICK_LAUNCH: QuickLaunchItem[] = [
 const TODOS_KEY = "dinam-dashboard-todos"
 const BOOKMARKS_KEY = "dinam-dashboard-bookmarks"
 const QUICK_LAUNCH_KEY = "dinam-dashboard-quick-launch"
+const SCRATCHPAD_KEY = "dinam-dashboard-scratchpad"
 
 function persistToStorage(key: string, value: string): void {
   try {
@@ -166,10 +167,20 @@ function loadQuickLaunch(): QuickLaunchItem[] {
   }
 }
 
+function loadScratchpad(): string {
+  try {
+    return localStorage.getItem(SCRATCHPAD_KEY) || ""
+  } catch {
+    return ""
+  }
+}
+
 export type DashboardStateContextValue = {
   todos: DashboardTodo[]
   bookmarks: BookmarkItem[]
   quickLaunchItems: QuickLaunchItem[]
+  scratchpad: string
+
   addTodo: (
     label: string,
     startDate?: string,
@@ -189,6 +200,7 @@ export type DashboardStateContextValue = {
     id: string,
     patch: Partial<Pick<QuickLaunchItem, "title" | "url">>
   ) => void
+  setScratchpad: (val: string) => void
 }
 
 const DashboardStateContext = createContext<DashboardStateContextValue | null>(
@@ -200,6 +212,7 @@ export function DashboardStateProvider({ children }: { children: ReactNode }) {
   const [bookmarks, setBookmarksState] = useState<BookmarkItem[]>(loadBookmarks)
   const [quickLaunchItems, setQuickLaunchState] =
     useState<QuickLaunchItem[]>(loadQuickLaunch)
+  const [scratchpad, setScratchpadState] = useState<string>(loadScratchpad)
 
   useEffect(() => {
     persistToStorage(TODOS_KEY, JSON.stringify(todos))
@@ -346,11 +359,17 @@ export function DashboardStateProvider({ children }: { children: ReactNode }) {
     []
   )
 
+  const setScratchpad = useCallback((val: string) => {
+    persistToStorage(SCRATCHPAD_KEY, val)
+    setScratchpadState(val)
+  }, [])
+
   const value = useMemo(
     () => ({
       todos,
       bookmarks,
       quickLaunchItems,
+      scratchpad,
       addTodo,
       toggleTodo,
       updateTodo,
@@ -362,11 +381,13 @@ export function DashboardStateProvider({ children }: { children: ReactNode }) {
       addQuickLaunchItem,
       removeQuickLaunchItem,
       updateQuickLaunchItem,
+      setScratchpad,
     }),
     [
       todos,
       bookmarks,
       quickLaunchItems,
+      scratchpad,
       addTodo,
       toggleTodo,
       updateTodo,
@@ -378,6 +399,7 @@ export function DashboardStateProvider({ children }: { children: ReactNode }) {
       addQuickLaunchItem,
       removeQuickLaunchItem,
       updateQuickLaunchItem,
+      setScratchpad,
     ]
   )
 

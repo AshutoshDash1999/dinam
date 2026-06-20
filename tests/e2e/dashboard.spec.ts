@@ -1,7 +1,7 @@
-import { test, expect } from '@playwright/test';
+import { test, expect } from "@playwright/test"
 
-test('dashboard renders correctly', async ({ page }) => {
-  await page.goto('/');
+test("dashboard renders correctly", async ({ page }) => {
+  await page.goto("/")
 
-  await expect(page.locator('body')).toBeVisible();
-});
+  await expect(page.locator("body")).toBeVisible()
+})

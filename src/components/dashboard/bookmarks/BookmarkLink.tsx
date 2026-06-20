@@ -58,7 +58,7 @@ export function BookmarkLink({ node }: { node: BrowserBookmark }) {
         />
       </span>
 
-    <span className="block min-w-0 flex-1 overflow-hidden truncate whitespace-nowrap text-sm font-medium">
+      <span className="block min-w-0 flex-1 truncate overflow-hidden text-sm font-medium whitespace-nowrap">
         {node.title || node.url}
       </span>
 

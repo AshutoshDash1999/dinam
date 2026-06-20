@@ -31,14 +31,19 @@ export function BookmarksSection() {
       {loadingBookmarks ? (
         <div className="flex flex-col gap-2">
           {Array.from({ length: 4 }).map((_, i) => (
-            <div key={i} className="flex items-center gap-3 rounded-lg px-2 py-1.5 animate-pulse">
+            <div
+              key={i}
+              className="flex animate-pulse items-center gap-3 rounded-lg px-2 py-1.5"
+            >
               <div className="size-4 shrink-0 rounded bg-white/10" />
               <div className="h-3 flex-1 rounded bg-white/10" />
             </div>
           ))}
         </div>
       ) : bookmarks.length === 0 ? (
-        <div className="px-2 py-1.5 text-xs text-foreground/40">No bookmarks</div>
+        <div className="px-2 py-1.5 text-xs text-foreground/40">
+          No bookmarks
+        </div>
       ) : (
         <ul className="flex flex-col gap-2">
           {bookmarks.map((item) => {

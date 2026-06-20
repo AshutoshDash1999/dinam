@@ -13,7 +13,14 @@ import { useDashboardState } from "@/context/dashboard-state"
 import { TaskItem } from "./TaskItem"
 
 export function TasksSection() {
-  const { todos = [], addTodo, toggleTodo, updateTodo, deleteTodo, clearCompletedTodos } = useDashboardState()
+  const {
+    todos = [],
+    addTodo,
+    toggleTodo,
+    updateTodo,
+    deleteTodo,
+    clearCompletedTodos,
+  } = useDashboardState()
   const [newTaskLabel, setNewTaskLabel] = useState("")
   const taskInputRef = useRef<HTMLInputElement | null>(null)
 
@@ -35,7 +42,7 @@ export function TasksSection() {
         <div className="flex items-center gap-3">
           <h2 className={dashboardSectionLabelClassName}>Focus Items</h2>
           {todos.length > 0 && (
-            <span className="text-[0.6rem] font-bold tabular-nums text-muted-foreground/40">
+            <span className="text-[0.6rem] font-bold text-muted-foreground/40 tabular-nums">
               {completedCount}/{todos.length}
             </span>
           )}
@@ -45,7 +52,7 @@ export function TasksSection() {
             <button
               type="button"
               onClick={clearCompletedTodos}
-              className="text-[0.6rem] font-bold uppercase tracking-widest text-muted-foreground/40 transition-colors hover:text-destructive"
+              className="text-[0.6rem] font-bold tracking-widest text-muted-foreground/40 uppercase transition-colors hover:text-destructive"
             >
               Clear
             </button>
@@ -60,7 +67,7 @@ export function TasksSection() {
         />
       )}
 
-      <ScrollArea className="flex-1 min-h-0 pr-1">
+      <ScrollArea className="min-h-0 flex-1 pr-1">
         {todos.length === 0 ? (
           <div className="flex flex-col items-center justify-center gap-2 py-6 opacity-40">
             <CheckSquare className="size-8 stroke-[1.5]" />
@@ -85,7 +92,7 @@ export function TasksSection() {
             {done.length > 0 && (
               <div className="mt-3">
                 <div className="mb-1.5 flex items-center gap-2">
-                  <span className="text-[0.6rem] font-bold uppercase tracking-widest text-muted-foreground/30">
+                  <span className="text-[0.6rem] font-bold tracking-widest text-muted-foreground/30 uppercase">
                     Done
                   </span>
                   <div className="h-px flex-1 bg-border/40" />
