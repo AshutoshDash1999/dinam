@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "Dinam",
-  "version": "1.0.0",
+  "version": "0.0.1",
   "description": "A personal dashboard that replaces your new tab page.",
   "chrome_url_overrides": {
     "newtab": "index.html"

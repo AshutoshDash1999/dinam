@@ -10,15 +10,36 @@ import type { BrowserBookmark } from "@/types/browser-bookmarks"
 export function useBrowserBookmarks() {
   const [bookmarks, setBookmarks] = useState<BrowserBookmark[]>([])
   const [loadingBookmarks, setLoadingBookmarks] = useState(true)
+  const [bookmarksError, setBookmarksError] = useState<string | null>(null)
 
   useEffect(() => {
+    let isMounted = true
     async function load() {
-      setLoadingBookmarks(true)
+      if (isMounted) {
+        setLoadingBookmarks(true)
+        setBookmarksError(null)
+      }
 
-      const data = await getBrowserBookmarks()
+      try {
+        const data = await getBrowserBookmarks()
+        if (!isMounted) return
 
-      setBookmarks(data)
-      setLoadingBookmarks(false)
+        setBookmarks(data)
+      } catch (error) {
+        if (!isMounted) return
+
+        const message =
+          error instanceof Error
+            ? error.message
+            : "Unable to load browser bookmarks."
+
+        setBookmarks([])
+        setBookmarksError(message)
+      } finally {
+        if (isMounted) {
+          setLoadingBookmarks(false)
+        }
+      }
     }
 
     load()
@@ -27,11 +48,11 @@ export function useBrowserBookmarks() {
       load()
     })
 
-    return unsubscribe
+    return () => {
+      isMounted = false
+      unsubscribe()
+    }
   }, [])
 
-  return {
-    bookmarks,
-    loadingBookmarks,
-  }
+  return { bookmarks, loadingBookmarks, bookmarksError }
 }

@@ -1,0 +1,44 @@
+name: Extension Release Artifact
+
+on:
+  push:
+    tags:
+      - "v*"
+  release:
+    types:
+      - published
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  package-extension:
+    name: Build and upload extension artifact
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event_name == 'release' && github.event.release.tag_name || github.ref }}
+          persist-credentials: false
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build and package extension
+        run: npm run release:extension
+
+      - name: Upload packaged extension ZIP
+        uses: actions/upload-artifact@v4
+        with:
+          name: dinam-extension-zip-${{ github.run_number }}
+          path: release/*.zip
+          if-no-files-found: error
