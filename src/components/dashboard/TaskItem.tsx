@@ -1,4 +1,4 @@
-import { useState, useCallback } from "react"
+import { useState, useCallback, useRef } from "react"
 import { Check, Pencil, Trash2, X } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { type DashboardTodo } from "@/context/dashboard-state"
@@ -13,18 +13,25 @@ interface TaskItemProps {
 export function TaskItem({ todo, onToggle, onDelete, onUpdate }: TaskItemProps) {
   const [isEditing, setIsEditing] = useState(false)
   const [editLabel, setEditLabel] = useState(todo.label)
+  const isCancelingRef = useRef(false)
 
   const handleStartEdit = useCallback(() => {
+    isCancelingRef.current = false
     setEditLabel(todo.label)
     setIsEditing(true)
   }, [todo.label])
 
   const handleCancelEdit = useCallback(() => {
+    isCancelingRef.current = true
     setIsEditing(false)
     setEditLabel(todo.label)
   }, [todo.label])
 
   const handleCommitEdit = useCallback(() => {
+    if (isCancelingRef.current) {
+      isCancelingRef.current = false
+      return
+    }
     const trimmed = editLabel.trim()
     if (trimmed && trimmed !== todo.label) {
       onUpdate(trimmed)
@@ -55,7 +62,10 @@ export function TaskItem({ todo, onToggle, onDelete, onUpdate }: TaskItemProps) 
             onChange={(e) => setEditLabel(e.target.value)}
             onKeyDown={(e) => {
               if (e.key === "Enter") handleCommitEdit()
-              if (e.key === "Escape") handleCancelEdit()
+              if (e.key === "Escape") {
+                isCancelingRef.current = true
+                handleCancelEdit()
+              }
             }}
             onBlur={handleCommitEdit}
             className="flex-1 bg-transparent border-none outline-none text-sm font-medium text-foreground p-0 focus:ring-0"
@@ -81,6 +91,11 @@ export function TaskItem({ todo, onToggle, onDelete, onUpdate }: TaskItemProps) 
       <div className="flex items-center gap-1 opacity-0 transition-opacity group-hover/task:opacity-100 group-focus-within/task:opacity-100">
         <button
           type="button"
+          onMouseDown={() => {
+            if (isEditing) {
+              isCancelingRef.current = true
+            }
+          }}
           onClick={isEditing ? handleCancelEdit : handleStartEdit}
           aria-label={isEditing ? "Cancel edit" : "Edit task"}
           aria-expanded={isEditing}
