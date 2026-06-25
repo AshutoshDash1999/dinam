@@ -243,7 +243,7 @@ export function DashboardHeader({ onOpenAssistant }: DashboardHeaderProps) {
                   type="button"
                   variant="ghost"
                   size="icon"
-                  className="rounded-full text-foreground/80 hover:bg-white/5"
+                  className="rounded-full text-foreground/80 hover:bg-foreground/5"
                   aria-label={
                     resolvedTheme === "dark"
                       ? "Switch to light mode"
@@ -271,7 +271,7 @@ export function DashboardHeader({ onOpenAssistant }: DashboardHeaderProps) {
                     type="button"
                     variant="ghost"
                     size="icon"
-                    className="rounded-full text-foreground/80 hover:bg-white/5"
+                    className="rounded-full text-foreground/80 hover:bg-foreground/5"
                     aria-label="Open assistant"
                     onClick={onOpenAssistant}
                   >
@@ -289,7 +289,7 @@ export function DashboardHeader({ onOpenAssistant }: DashboardHeaderProps) {
                   type="button"
                   variant="ghost"
                   size="icon"
-                  className="rounded-full text-foreground/80 hover:bg-white/5"
+                  className="rounded-full text-foreground/80 hover:bg-foreground/5"
                   aria-label="Open settings"
                   onClick={() => setSettingsOpen(true)}
                 >
@@ -311,12 +311,12 @@ export function DashboardHeader({ onOpenAssistant }: DashboardHeaderProps) {
 
       <div className="mt-4 flex flex-col items-center text-center">
         <div className="mb-6 flex flex-col items-center gap-2">
-          <p className="text-center text-2xl leading-[0.9] font-bold tracking-tighter text-white select-none">
+          <p className="text-center text-2xl leading-[0.9] font-bold tracking-tighter text-foreground select-none">
             <span className="inline-block max-w-6xl leading-none text-balance">
               {quote.text}
             </span>
           </p>
-          <span className="text-sm text-white/50 select-none">
+          <span className="text-sm text-muted-foreground select-none">
             — {quote.author}
           </span>
         </div>
@@ -355,7 +355,7 @@ export function DashboardHeader({ onOpenAssistant }: DashboardHeaderProps) {
             }}
             placeholder="Search the web or type a URL"
             autoComplete="off"
-            className="h-11 rounded-full border-white/5 bg-white/5 px-12 text-sm transition-all placeholder:text-muted-foreground/40 focus:border-white/10 focus:bg-white/10 focus:ring-0"
+            className="h-11 rounded-full border-foreground/5 bg-foreground/5 px-12 text-sm transition-all placeholder:text-muted-foreground/50 focus:border-foreground/10 focus:bg-foreground/10 focus:ring-0"
           />
           <div className="absolute top-1/2 right-5 z-10 flex -translate-y-1/2 items-center gap-2">
             <Tooltip>
