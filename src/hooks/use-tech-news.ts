@@ -1,6 +1,6 @@
 import dayjs from "dayjs"
 import relativeTime from "dayjs/plugin/relativeTime"
-import { useState, useEffect } from "react"
+import { useCallback, useEffect, useRef, useState } from "react"
 
 dayjs.extend(relativeTime)
 
@@ -34,7 +34,15 @@ export function useTechNews() {
   const [status, setStatus] = useState<FetchStatus>("loading")
   const [lastUpdated, setLastUpdated] = useState<number | null>(null)
 
-  async function fetchNews(forceRefresh = false, isMounted = true) {
+  // Track mount state for the whole hook lifetime, not just the initial effect.
+  // The old code path passed `isMounted` in as a function arg and hardcoded
+  // `true` at the refreshNews call site, so a refresh fired right before an
+  // unmount (or a second refresh before the first resolved) still wrote state
+  // — and the older in-flight request could overwrite the newer one.
+  const isMountedRef = useRef(true)
+  const abortRef = useRef<AbortController | null>(null)
+
+  const fetchNews = useCallback(async (forceRefresh = false) => {
     // 1. Check Cache
     if (!forceRefresh) {
       try {
@@ -44,6 +52,7 @@ export function useTechNews() {
           const parsed = JSON.parse(cachedRaw) as CacheData
 
           if (Date.now() - parsed.timestamp < CACHE_TTL_MS) {
+            if (!isMountedRef.current) return
             setNews(parsed.items)
             setLastUpdated(parsed.timestamp)
             setStatus("success")
@@ -55,12 +64,20 @@ export function useTechNews() {
       }
     }
 
+    // Cancel any in-flight fetch so a slow earlier request can't clobber
+    // this refresh's result when it finally resolves.
+    abortRef.current?.abort()
+    const controller = new AbortController()
+    abortRef.current = controller
+
+    if (isMountedRef.current) setStatus("loading")
+
     // 2. Fetch Fresh Data (Algolia Hacker News API)
-    setStatus("loading")
     try {
       // Fetch front page stories, 4 items
       const res = await fetch(
-        "https://hn.algolia.com/api/v1/search?tags=front_page&hitsPerPage=4"
+        "https://hn.algolia.com/api/v1/search?tags=front_page&hitsPerPage=4",
+        { signal: controller.signal }
       )
       if (!res.ok) throw new Error("Failed to fetch news")
 
@@ -83,29 +100,35 @@ export function useTechNews() {
           }
         })
 
-      if (isMounted) {
-        const timestamp = Date.now()
+      // Discard if this request was superseded or the component unmounted
+      // between the fetch kicking off and now.
+      if (controller.signal.aborted || !isMountedRef.current) return
 
-        setNews(fetchedItems)
-        setLastUpdated(timestamp)
-        setStatus("success")
+      const timestamp = Date.now()
 
-        localStorage.setItem(
-          CACHE_KEY,
-          JSON.stringify({
-            timestamp,
-            items: fetchedItems,
-          } satisfies CacheData)
-        )
-      }
-    } catch {
+      setNews(fetchedItems)
+      setLastUpdated(timestamp)
+      setStatus("success")
+
+      localStorage.setItem(
+        CACHE_KEY,
+        JSON.stringify({
+          timestamp,
+          items: fetchedItems,
+        } satisfies CacheData)
+      )
+    } catch (err) {
+      // AbortError is expected when a newer refresh cancels this one — don't
+      // surface it as an error state to the UI.
+      if ((err as { name?: string })?.name === "AbortError") return
+
       try {
         const cachedRaw = localStorage.getItem(CACHE_KEY)
 
         if (cachedRaw) {
           const parsed = JSON.parse(cachedRaw) as CacheData
 
-          if (isMounted) {
+          if (isMountedRef.current) {
             setNews(parsed.items)
             setLastUpdated(parsed.timestamp)
             setStatus("success")
@@ -117,26 +140,28 @@ export function useTechNews() {
         /* empty */
       }
 
-      if (isMounted) {
+      if (isMountedRef.current) {
         setStatus("error")
       }
     }
-  }
+  }, [])
 
   useEffect(() => {
-    let isMounted = true
-
-    fetchNews(false, isMounted)
+    isMountedRef.current = true
+    fetchNews(false)
 
     return () => {
-      isMounted = false
+      isMountedRef.current = false
+      abortRef.current?.abort()
     }
-  }, [])
+  }, [fetchNews])
+
+  const refreshNews = useCallback(() => fetchNews(true), [fetchNews])
 
   return {
     news,
     status,
     lastUpdated,
-    refreshNews: () => fetchNews(true, true),
+    refreshNews,
   }
 }
