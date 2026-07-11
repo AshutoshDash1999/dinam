@@ -126,7 +126,7 @@ export function TasksSection() {
             type="button"
             onClick={addTask}
             disabled={!newTaskLabel.trim()}
-            className="h-9 shrink-0 rounded-xl border border-white/5 bg-white/5 px-4 text-xs font-semibold text-foreground shadow-sm transition-all hover:bg-white/10 active:scale-95 disabled:opacity-40"
+            className="h-9 shrink-0 rounded-xl border border-foreground/5 bg-foreground/5 px-4 text-xs font-semibold text-foreground shadow-sm transition-all hover:bg-foreground/10 active:scale-95 disabled:opacity-40"
           >
             <Plus className="mr-1 size-3.5" strokeWidth={3} />
             Add
