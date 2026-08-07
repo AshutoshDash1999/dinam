@@ -114,6 +114,7 @@ function loadTodos(): DashboardTodo[] {
           done: Boolean(x.done),
           startDate: x.startDate ? String(x.startDate) : "",
           dueDate: x.dueDate ? String(x.dueDate) : "",
+          // duplicate key progress removed
           progress: typeof x.progress === "number" ? x.progress : 0,
           finishedDate: x.finishedDate ? String(x.finishedDate) : "",
         }

@@ -37,7 +37,7 @@ export function readStoicQuoteFromStorage(): StoicQuoteStored | null {
       typeof dayKey !== "string" ||
       typeof quote !== "string" ||
       typeof author !== "string" ||
-      dayKey.trim() === "" ||
+      dayKey.trim().length === 0 ||
       quote.trim() === "" ||
       author.trim() === ""
     ) {
